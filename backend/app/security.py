@@ -53,7 +53,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "form-action 'self'",
         )
         response.headers.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
-        # Do not cache API error responses aggressively; public GETs already set Cache-Control
+        # Fallback only when handlers did not set Cache-Control (e.g. errors)
         if request.url.path.startswith("/api/"):
-            response.headers.setdefault("Cache-Control", "public, max-age=300")
+            response.headers.setdefault(
+                "Cache-Control", "public, max-age=60, stale-while-revalidate=300"
+            )
         return response

@@ -80,7 +80,9 @@ export type HealthResponse = {
 }
 
 async function getJson<T>(url: string): Promise<T> {
-  const res = await fetch(url)
+  // Revalidate with the server on each navigation/filter change so post-job
+  // data appears without a hard refresh (server still controls Cache-Control).
+  const res = await fetch(url, { cache: 'no-cache' })
   if (!res.ok) {
     throw new Error(`${res.status} ${res.statusText}`)
   }

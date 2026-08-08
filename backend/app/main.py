@@ -119,7 +119,13 @@ def create_app() -> FastAPI:
             # Never serve SPA for API paths; block path traversal
             if full_path.startswith("api/") or ".." in full_path or full_path.startswith("/"):
                 raise HTTPException(status_code=404)
-            return FileResponse(index_path)
+            # Always revalidate index.html so deploys pick up new hashed JS without hard refresh
+            return FileResponse(
+                index_path,
+                headers={
+                    "Cache-Control": "no-cache, must-revalidate",
+                },
+            )
     else:
         logger.info("Frontend static files not built at %s (dev mode OK)", STATIC_DIR)
 

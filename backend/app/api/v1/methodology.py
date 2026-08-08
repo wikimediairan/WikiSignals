@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import get_settings
 from app.db.session import get_db
+from app.http_cache import set_public_cache
 from app.schemas.api import MetricDefinitionOut, MethodologyOut
 from app.services import metrics as metric_service
 
@@ -11,8 +11,7 @@ router = APIRouter()
 
 @router.get("/methodology", response_model=MethodologyOut)
 async def methodology(response: Response, db: AsyncSession = Depends(get_db)) -> MethodologyOut:
-    settings = get_settings()
-    response.headers["Cache-Control"] = f"public, max-age={settings.public_cache_max_age_seconds}"
+    set_public_cache(response)
     defs = await metric_service.list_metric_definitions(db)
     return MethodologyOut(
         timezone="UTC",

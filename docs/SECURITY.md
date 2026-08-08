@@ -67,7 +67,7 @@ There is **no** public write API for annotations, metrics, or config in the curr
 | ID | Finding | Mitigation |
 |----|---------|------------|
 | L1 | Error messages may include upstream body snippets | Truncated; useful for UA debugging |
-| L2 | Public metric values are cacheable | Intentional for public data; tune `PUBLIC_CACHE_MAX_AGE` |
+| L2 | Public metric values are cacheable | Short TTL (`PUBLIC_CACHE_MAX_AGE_SECONDS`, default 60) + `stale-while-revalidate`; SPA `index.html` is `no-cache` |
 | L3 | Fonts loaded from Google Fonts | CSP allows fonts.googleapis.com; optional self-host later |
 | L4 | SQLite local DB file permissions | Dev only; ToolsDB in production |
 

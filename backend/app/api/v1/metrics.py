@@ -3,8 +3,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import get_settings
 from app.db.session import get_db
+from app.http_cache import set_public_cache
 from app.security import is_safe_metric_id, is_safe_project_id
 from app.schemas.api import (
     BatchMetricsOut,
@@ -23,8 +23,7 @@ router = APIRouter()
 
 
 def _cache_headers(response: Response) -> None:
-    settings = get_settings()
-    response.headers["Cache-Control"] = f"public, max-age={settings.public_cache_max_age_seconds}"
+    set_public_cache(response)
 
 
 def _series_out(

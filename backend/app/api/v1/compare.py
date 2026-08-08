@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import get_settings
 from app.db.session import get_db
+from app.http_cache import set_public_cache
 from app.schemas.api import CompareOut, SeriesPointOut
 from app.services import metrics as metric_service
 
@@ -26,8 +26,7 @@ async def compare_projects(
     normalize: str | None = Query(None, description="raw (default) or leave empty"),
     db: AsyncSession = Depends(get_db),
 ) -> CompareOut:
-    settings = get_settings()
-    response.headers["Cache-Control"] = f"public, max-age={settings.public_cache_max_age_seconds}"
+    set_public_cache(response)
     project_ids = [p.strip() for p in projects.split(",") if p.strip()]
     if len(project_ids) < 1:
         raise HTTPException(status_code=400, detail="At least one project is required")

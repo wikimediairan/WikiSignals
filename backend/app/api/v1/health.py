@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import get_settings
 from app.db.session import get_db
+from app.http_cache import set_public_cache
 from app.models.health import BacklogSnapshot, ProcessSnapshot
 from app.services import metrics as metric_service
 from app.services.signals import build_health_signals
@@ -21,8 +21,7 @@ async def project_health(
     end: str | None = None,
     db: AsyncSession = Depends(get_db),
 ) -> dict:
-    settings = get_settings()
-    response.headers["Cache-Control"] = f"public, max-age={settings.public_cache_max_age_seconds}"
+    set_public_cache(response)
     project = await metric_service.get_project(db, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -36,8 +35,7 @@ async def project_backlogs(
     response: Response,
     db: AsyncSession = Depends(get_db),
 ) -> dict:
-    settings = get_settings()
-    response.headers["Cache-Control"] = f"public, max-age={settings.public_cache_max_age_seconds}"
+    set_public_cache(response)
     project = await metric_service.get_project(db, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -91,8 +89,7 @@ async def project_processes(
     response: Response,
     db: AsyncSession = Depends(get_db),
 ) -> dict:
-    settings = get_settings()
-    response.headers["Cache-Control"] = f"public, max-age={settings.public_cache_max_age_seconds}"
+    set_public_cache(response)
     project = await metric_service.get_project(db, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")

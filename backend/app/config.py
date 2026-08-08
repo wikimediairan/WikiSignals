@@ -46,7 +46,10 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173,http://localhost:8000"
     frontend_url: str = "http://localhost:5173"
     default_project_id: str = "fa.wikipedia"
-    public_cache_max_age_seconds: int = 3600
+    # Browser/proxy cache for public GET API. Keep short so post-job refreshes
+    # show new series without a hard reload (was 3600; felt "stuck").
+    public_cache_max_age_seconds: int = 60
+    public_cache_stale_while_revalidate_seconds: int = 300
 
     # OpenAPI /docs — disable in production on Toolforge
     docs_enabled: bool = True
