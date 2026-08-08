@@ -1,22 +1,22 @@
 # Architecture
 
 ```
-Vue SPA (health-first)  →  FastAPI /api/v1  →  MariaDB aggregates + provenance
-                                ↑
-              Jobs: AQS context · collect-health · compute-signals
-                                ↑
-     Official AQS (context) │ MW collectors (backlog, logs, processes) │ Replicas (opt.)
+Vue SPA  →  FastAPI /api/v1  →  MariaDB / ToolsDB (aggregates + provenance)
+                  ▲
+         Jobs write series / snapshots
+                  │
+   AQS (official context) · MediaWiki API (health) · wiki replicas (conflict)
 ```
 
 Official analytics feed **context and denominators**. Local collectors compute **health-domain** metrics Wikistats does not provide.
 
 ## Layers
 
-1. **Providers** — HTTP/SQL to external systems only
-2. **Pipeline** — normalize + upsert aggregates
-3. **Services** — registry, ingest, metric read models
-4. **API** — versioned public read API
-5. **SPA** — shareable URL state, EN/FA, RTL/LTR
+1. **Providers** — HTTP/SQL to external systems only (`providers/`)
+2. **Pipeline** — normalize + upsert aggregates (`pipeline/store.py`)
+3. **Services** — registry, ingest, metric read models, signals
+4. **API** — versioned public read API (`/api/v1`)
+5. **SPA** — shareable URL state, EN/FA, RTL/LTR (`frontend/` → `backend/app/static`)
 
 ## Multi-project design
 
@@ -24,11 +24,15 @@ Projects live in `config/projects/*.yaml` and the `projects` table. Metric code 
 
 ## Jobs
 
-```bash
-python -m app.jobs.cli bootstrap
-python -m app.jobs.cli ingest --project fa.wikipedia
-python -m app.jobs.cli ingest --all
-python -m app.jobs.cli verify --project fa.wikipedia --metric editors.active --month 2024-06
-```
+| CLI | Typical use |
+|-----|-------------|
+| `seed-registry` | YAML → DB |
+| `bootstrap` / `ingest` | Official AQS history |
+| `collect-health` | Maintenance / process / admin logs (MW API) |
+| `collect-replicas` | Reverts / active admins |
+| `daily` | Budgeted incremental update (Toolforge schedule) |
+| `diagnose` / `check-connectivity` | Ops debugging |
 
-Failed runs are recorded in `ingestion_runs`. Upserts are idempotent for safe retries.
+Failed runs can be recorded in `ingestion_runs`. Series upserts are idempotent for safe retries.
+
+Deploy: [DEPLOY.md](DEPLOY.md) · contribute: [../CONTRIBUTING.md](../CONTRIBUTING.md).

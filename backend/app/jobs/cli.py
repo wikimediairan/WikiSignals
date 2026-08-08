@@ -1,4 +1,4 @@
-"""Observatory CLI: bootstrap, ingest, verify."""
+"""WikiSignals CLI: bootstrap, ingest, health collectors, daily jobs."""
 
 from __future__ import annotations
 

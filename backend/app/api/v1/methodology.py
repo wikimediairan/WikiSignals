@@ -23,7 +23,7 @@ async def methodology(response: Response, db: AsyncSession = Depends(get_db)) ->
             "year": "Calendar year starting 1 January 00:00 UTC",
         },
         privacy_summary=(
-            "The Observatory emphasizes aggregate community-health analytics from public "
+            "WikiSignals emphasizes aggregate community-health analytics from public "
             "Wikimedia data. It does not rank individual volunteers, infer protected "
             "characteristics, or present surveillance-oriented behavioral profiles."
         ),

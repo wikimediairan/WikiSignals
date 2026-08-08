@@ -1,3 +1,3 @@
-"""Wikimedia Activity Observatory backend."""
+"""WikiSignals backend."""
 
 __version__ = "0.1.0"

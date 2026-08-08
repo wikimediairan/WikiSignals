@@ -186,7 +186,7 @@ async def cohorts(
             project_id=project_id,
             available=False,
             reason=(
-                "Deprecated in Community Health Observatory primary surface. "
+                "Deprecated in WikiSignals primary surface. "
                 "Detailed newcomer cohorts belong to the New Editor Health Dashboard. "
                 "Replica-backed data may still be stored when configured."
             ),

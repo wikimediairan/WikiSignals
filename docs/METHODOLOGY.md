@@ -5,7 +5,7 @@ All internal timestamps and period boundaries use **UTC**.
 ## Product principle
 
 Wikistats / Wikimedia Analytics measure **activity volume**.  
-This observatory measures **operational and community pressures**.
+WikiSignals measures **operational and community pressures**.
 
 **Rule:** Do not independently reproduce a metric already authoritatively provided by Wikimedia Analytics or Wikistats unless there is a specific technical reason. Prefer consuming official metrics with provenance. Spend local computation on metrics Wikistats does not provide.
 

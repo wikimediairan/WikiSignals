@@ -4,7 +4,7 @@ Base path: `/api/v1`
 
 OpenAPI interactive docs: `/docs` (when the backend is running).
 
-All timestamps and `period_start` values are **UTC**. Aggregates are public; responses may include `Cache-Control: public`.
+All timestamps and `period_start` values are **UTC**. Aggregates are public; responses use short `Cache-Control` TTLs (see `PUBLIC_CACHE_MAX_AGE_SECONDS`).
 
 ## Projects
 

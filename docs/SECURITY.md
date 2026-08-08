@@ -161,3 +161,10 @@ This tool:
 - Implements **statement timeouts** and **lag gates** on replicas  
 
 It should be treated as a normal analytics tool, not a high-risk data processor — provided daily budgets stay in place.
+
+---
+
+## 10. Related
+
+- Fresh deploy: [DEPLOY.md](DEPLOY.md)  
+- Load budgets: [DATA_COLLECTION.md](DATA_COLLECTION.md)  
