@@ -14,5 +14,6 @@ bootstrap: bash -c "export HOME=/tmp TMPDIR=/tmp; unset CONFIG_DIR; cd backend &
 bootstrap-5y: bash -c "export HOME=/tmp TMPDIR=/tmp; unset CONFIG_DIR; cd backend && exec python -m app.jobs.cli bootstrap --project fa.wikipedia --months 60"
 ingest-5y: bash -c "export HOME=/tmp TMPDIR=/tmp; unset CONFIG_DIR; cd backend && exec python -m app.jobs.cli ingest --project fa.wikipedia --since 2021-01-01"
 collect-health: bash -c "export HOME=/tmp TMPDIR=/tmp; unset CONFIG_DIR; cd backend && exec python -m app.jobs.cli collect-health --project fa.wikipedia --months 2"
+collect-replicas: bash -c "export HOME=/tmp TMPDIR=/tmp; unset CONFIG_DIR; cd backend && exec python -m app.jobs.cli collect-replicas --project fa.wikipedia --months 24"
 daily: bash -c "export HOME=/tmp TMPDIR=/tmp; unset CONFIG_DIR; cd backend && exec python -m app.jobs.cli daily --project fa.wikipedia"
 check: bash -c "export HOME=/tmp TMPDIR=/tmp; unset CONFIG_DIR; cd backend && exec python -m app.jobs.cli check-connectivity"

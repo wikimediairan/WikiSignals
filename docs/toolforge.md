@@ -116,7 +116,12 @@ toolforge envvars create DAILY_USE_MEDIAWIKI_LOGS "true"
 toolforge envvars create DAILY_USE_REPLICAS "true"
 ```
 
-### Wiki replicas (recommended on Toolforge)
+### Wiki replicas (required for conflict / reverts)
+
+Env vars alone do **not** populate conflict metrics. After setting credentials, run
+the one-off `collect-replicas` job (or wait for `daily`, which only covers ~3 months).
+`collect-health` does not touch replicas.
+
 
 Credentials usually come from `~/replica.my.cnf` after replica access is provisioned for the tool.
 

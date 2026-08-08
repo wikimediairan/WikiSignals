@@ -67,13 +67,22 @@ toolforge envvars create HTTP_MIN_INTERVAL_SECONDS "0.75"
 toolforge envvars create DAILY_MAX_PROJECTS "2"
 ```
 
-Replicas (optional later):
+Replicas (required for **conflict** signals: reverts, active admins):
 
 ```bash
+# Credentials from the tool account (on bastion):
+#   cat ~/replica.my.cnf
 toolforge envvars create WIKI_REPLICAS_ENABLED "true"
 toolforge envvars create WIKI_REPLICAS_HOST "fawiki.analytics.db.svc.wikimedia.cloud"
-# user/password auto from TOOL_REPLICA_* if set by Toolforge
+toolforge envvars create WIKI_REPLICAS_USER "sXXXXX"          # from replica.my.cnf user=
+toolforge envvars create WIKI_REPLICAS_PASSWORD "…"           # from replica.my.cnf password=
+toolforge envvars create WIKI_REPLICAS_PORT "3306"
+# optional: TOOL_REPLICA_USER / TOOL_REPLICA_PASSWORD are used if WIKI_REPLICAS_USER is empty
 ```
+
+**Important:** env vars alone do not fill the API. You must run `collect-replicas` (backfill)
+or `daily` (last ~3 months). `collect-health` is MediaWiki API only (maintenance/admin logs)
+and does **not** write reverts.
 
 ---
 
@@ -195,12 +204,36 @@ Use a real `USER_AGENT`. If you hit 403/429, wait and re-run — upserts are saf
 
 ### 7b. Maintenance + admin logs (current / recent)
 
+One-off job names are unique and stay registered after the run finishes. If you see `A job with the name … already exists`, delete first:
+
 ```bash
+toolforge jobs delete wikisignals-health
 toolforge jobs run wikisignals-health \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "collect-health" \
   --wait --emails onfailure
 ```
+
+### 7c. Conflict metrics (reverts) via wiki replicas
+
+```bash
+# Confirm the job container sees replica settings (no secrets printed):
+toolforge jobs delete wikisignals-diagnose 2>/dev/null || true
+toolforge jobs run wikisignals-diagnose \
+  --image tool-wikisignals/tool-wikisignals:latest \
+  --command "diagnose" --wait
+# Expect: wiki_replicas_enabled=True, wiki_replicas_ready=True, wiki_replicas_user_set=True
+
+toolforge jobs delete wikisignals-replicas 2>/dev/null || true
+toolforge jobs run wikisignals-replicas \
+  --image tool-wikisignals/tool-wikisignals:latest \
+  --command "collect-replicas" \
+  --wait --emails onfailure
+```
+
+This backfills ~24 months of `reverts.count` + active admins and derives `reverts.rate`.
+If the job fails on auth, re-check USER/PASSWORD from `~/replica.my.cnf`.
+If it fails on lag, wait and re-run, or raise `WIKI_REPLICAS_MAX_LAG_SECONDS` carefully.
 
 ---
 

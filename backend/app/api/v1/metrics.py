@@ -41,8 +41,10 @@ def _series_out(
     if definition and definition.status == "unavailable_without_replicas" and not points:
         status = "unavailable"
         unavailable_reason = (
-            "This metric requires Toolforge wiki replicas. "
-            "Configure WIKI_REPLICAS_* and run cohort/revert jobs."
+            "This metric requires Toolforge wiki replicas and stored series points. "
+            "Set WIKI_REPLICAS_ENABLED/HOST/USER/PASSWORD, then run "
+            "`collect-replicas` (backfill) or `daily` (recent months). "
+            "collect-health does not fill reverts."
         )
     return MetricSeriesOut(
         project_id=project_id,

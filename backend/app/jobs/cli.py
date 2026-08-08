@@ -270,6 +270,26 @@ def diagnose() -> None:
     typer.echo(f"database_url_host={_safe_db_host(settings.database_url)}")
     typer.echo(f"tool_toolsdb_user_set={bool(settings.tool_toolsdb_user)}")
     typer.echo(f"user_agent={settings.user_agent!r}")
+    # Replica config (conflict signals: reverts / active admins)
+    typer.echo(f"wiki_replicas_enabled={settings.wiki_replicas_enabled}")
+    typer.echo(f"wiki_replicas_host={settings.wiki_replicas_host!r}")
+    typer.echo(f"wiki_replicas_port={settings.wiki_replicas_port}")
+    typer.echo(f"wiki_replicas_user_set={bool(settings.wiki_replicas_user)}")
+    typer.echo(f"wiki_replicas_password_set={bool(settings.wiki_replicas_password)}")
+    typer.echo(f"tool_replica_user_set={bool(settings.tool_replica_user)}")
+    typer.echo(f"daily_use_replicas={settings.daily_use_replicas}")
+    replica_ready = bool(
+        settings.wiki_replicas_enabled
+        and settings.wiki_replicas_host
+        and settings.wiki_replicas_user
+    )
+    typer.echo(f"wiki_replicas_ready={replica_ready}")
+    if settings.wiki_replicas_enabled and not replica_ready:
+        typer.echo(
+            "HINT: set WIKI_REPLICAS_HOST + WIKI_REPLICAS_USER/PASSWORD "
+            "(or TOOL_REPLICA_USER/PASSWORD from ~/replica.my.cnf), then run collect-replicas",
+            err=True,
+        )
 
 
 async def _async_collect_health(project: str, months: int, reload_config: bool) -> None:
@@ -326,10 +346,125 @@ def collect_health(
 ) -> None:
     """Collect maintenance backlogs, process queues, admin logs; compute derived signals.
 
+    Does **not** collect reverts/conflict metrics — those need wiki replicas via collect-replicas
+    or the daily job with WIKI_REPLICAS_ENABLED.
+
     By default reloads config/projects/*.yaml so YAML edits apply without a separate seed step.
     """
     _setup_logging()
     asyncio.run(_async_collect_health(project, months, reload_config))
+
+
+async def _async_collect_replicas(project: str, months: int, chunk_months: int) -> None:
+    """Backfill aggregate reverts + active admins from Toolforge wiki replicas."""
+    from calendar import monthrange
+
+    from app.pipeline.store import upsert_series
+    from app.providers.replicas import ReplicasUnavailable, WikiReplicasProvider
+    from app.services.signals import compute_derived_metrics
+    from app.timeutil import add_interval, next_month_start
+
+    settings = get_settings()
+    if not settings.wiki_replicas_enabled:
+        typer.echo(
+            "ERROR: WIKI_REPLICAS_ENABLED is not true. "
+            "Env vars alone do nothing until collect-replicas/daily runs.",
+            err=True,
+        )
+        raise typer.Exit(1)
+    if not settings.wiki_replicas_host:
+        typer.echo("ERROR: WIKI_REPLICAS_HOST is empty", err=True)
+        raise typer.Exit(1)
+    if not settings.wiki_replicas_user:
+        typer.echo(
+            "ERROR: replica user empty. Set WIKI_REPLICAS_USER + WIKI_REPLICAS_PASSWORD "
+            "from ~/replica.my.cnf (or TOOL_REPLICA_USER / TOOL_REPLICA_PASSWORD).",
+            err=True,
+        )
+        raise typer.Exit(1)
+
+    factory = _session_factory()
+    end = utc_today()
+    start = months_back(month_start(end), months)
+    chunk = max(1, chunk_months)
+    typer.echo(
+        f"collect-replicas project={project} range={start}..{end} "
+        f"chunk_months={chunk} host={settings.wiki_replicas_host}"
+    )
+
+    async with factory() as session:
+        proj = await session.get(Project, project)
+        if not proj:
+            typer.echo(f"Project not found: {project}", err=True)
+            raise typer.Exit(1)
+        if not proj.dbname:
+            typer.echo(f"Project {project} has no dbname for replicas", err=True)
+            raise typer.Exit(1)
+
+        total_rev = 0
+        total_admins = 0
+        try:
+            async with WikiReplicasProvider(settings) as replicas:
+                if not replicas.available:
+                    typer.echo("ERROR: WikiReplicasProvider.available is false", err=True)
+                    raise typer.Exit(1)
+                lag = await replicas.check_lag_seconds()
+                typer.echo(f"replica_lag_seconds={lag}")
+                await replicas.ensure_lag_ok()
+
+                # Chunk the range so max_statement_time is less likely to kill long history
+                cursor = start
+                while cursor <= end:
+                    last_month_start = add_interval(cursor, "month", chunk - 1)
+                    last_day = monthrange(last_month_start.year, last_month_start.month)[1]
+                    chunk_end = min(end, last_month_start.replace(day=last_day))
+
+                    typer.echo(f"  query reverts {cursor}..{chunk_end} dbname={proj.dbname}")
+                    rev = await replicas.fetch_reverts_monthly(proj.dbname, cursor, chunk_end)
+                    n = await upsert_series(session, proj.id, rev, "month")
+                    total_rev += n
+                    typer.echo(f"  reverts points upserted={n}")
+
+                    groups = (proj.health_config or {}).get("admin_groups") or ["sysop"]
+                    admins = await replicas.fetch_active_admins_monthly(
+                        proj.dbname, cursor, chunk_end, admin_groups=groups
+                    )
+                    n2 = await upsert_series(session, proj.id, admins, "month")
+                    total_admins += n2
+                    typer.echo(f"  active_admins points upserted={n2}")
+
+                    cursor = next_month_start(chunk_end)
+        except ReplicasUnavailable as exc:
+            typer.echo(f"ERROR: replicas unavailable: {exc}", err=True)
+            raise typer.Exit(1) from exc
+        except Exception as exc:  # noqa: BLE001
+            logger.exception("collect-replicas failed")
+            typer.echo(f"ERROR: {exc}", err=True)
+            raise typer.Exit(1) from exc
+
+        derived = await compute_derived_metrics(session, proj)
+        typer.echo(
+            f"done: reverts_points={total_rev} active_admins_points={total_admins} "
+            f"derived={derived}"
+        )
+
+
+@app.command("collect-replicas")
+def collect_replicas(
+    project: str = typer.Option("fa.wikipedia", help="Project id, e.g. fa.wikipedia"),
+    months: int = typer.Option(24, help="Months of monthly revert/admin history to fetch"),
+    chunk_months: int = typer.Option(
+        3,
+        help="Fetch this many months per SQL query (keeps under max_statement_time)",
+    ),
+) -> None:
+    """Backfill conflict metrics (reverts.count, active admins) from wiki replicas.
+
+    Requires WIKI_REPLICAS_ENABLED, HOST, and USER/PASSWORD. Env vars alone do not
+    populate the API — this job (or daily) must run successfully first.
+    """
+    _setup_logging()
+    asyncio.run(_async_collect_replicas(project, months, chunk_months))
 
 
 async def _async_compute_signals(project: str) -> None:
