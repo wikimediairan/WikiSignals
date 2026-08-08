@@ -6,7 +6,11 @@ Up-to-date guide for hosting this app on [Toolforge](https://wikitech.wikimedia.
 
 Also see: [SECURITY.md](SECURITY.md), [DATA_COLLECTION.md](DATA_COLLECTION.md).
 
-Build from the **repository root** `Dockerfile` (includes `backend/` + `config/`).
+**Deploy with the official Python buildpack** ([docs](https://wikitech.wikimedia.org/wiki/Help:Toolforge/Building_container_images/My_first_Buildpack_Python_tool)):
+
+- Root `requirements.txt`, `Procfile`, `.python-version` (no root Dockerfile)
+- `web: gunicorn --chdir=backend ... app.main:app`
+- Start: `toolforge webservice buildservice start --mount=none`
 
 ---
 

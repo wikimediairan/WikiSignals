@@ -1,0 +1,16 @@
+# Root requirements for Toolforge Python buildpack
+# (same set as backend/requirements.txt)
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+gunicorn>=23.0.0
+sqlalchemy[asyncio]>=2.0.36
+aiomysql>=0.2.0
+aiosqlite>=0.20.0
+alembic>=1.14.0
+pydantic>=2.10.0
+pydantic-settings>=2.6.0
+httpx>=0.28.0
+pyyaml>=6.0.2
+typer>=0.15.0
+python-multipart>=0.0.18
+greenlet>=3.1.0

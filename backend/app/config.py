@@ -29,12 +29,18 @@ class Settings(BaseSettings):
     )
 
     database_url: str = "mysql+aiomysql://observatory:observatory@127.0.0.1:3308/observatory"
+    # Auto-filled on Toolforge if DATABASE_URL is unset (see model_post_init)
+    tool_toolsdb_user: str = ""
+    tool_toolsdb_password: str = ""
+    toolsdb_host: str = "tools.db.svc.wikimedia.cloud"
+    toolsdb_name: str = ""  # default: {user}__wikisignals
+
     db_pool_recycle_seconds: int = 180
     db_pool_size: int = 5
     db_max_overflow: int = 5
 
     redis_url: str = ""
-    redis_key_prefix: str = "observatory:"
+    redis_key_prefix: str = "wikisignals:"
 
     cors_origins: str = "http://localhost:5173,http://localhost:8000"
     frontend_url: str = "http://localhost:5173"
@@ -67,6 +73,9 @@ class Settings(BaseSettings):
     wiki_replicas_host: str = ""
     wiki_replicas_user: str = ""
     wiki_replicas_password: str = ""
+    # Toolforge injects these for wiki replicas
+    tool_replica_user: str = ""
+    tool_replica_password: str = ""
     wiki_replicas_port: int = 3306
     # Abort long replica statements (seconds). Keeps shared replicas healthy.
     wiki_replicas_max_statement_time: float = 30.0
@@ -76,6 +85,28 @@ class Settings(BaseSettings):
 
     # Paths: prefer /config mount in Docker, else repo config/
     config_dir: str = ""
+
+    def model_post_init(self, __context: object) -> None:
+        # ToolsDB: prefer explicit DATABASE_URL; else compose from Toolforge envvars
+        if (
+            (not self.database_url or "127.0.0.1" in self.database_url or "localhost" in self.database_url)
+            and self.tool_toolsdb_user
+            and self.tool_toolsdb_password
+        ):
+            db_name = self.toolsdb_name or f"{self.tool_toolsdb_user}__wikisignals"
+            object.__setattr__(
+                self,
+                "database_url",
+                (
+                    f"mysql+aiomysql://{self.tool_toolsdb_user}:{self.tool_toolsdb_password}"
+                    f"@{self.toolsdb_host}:3306/{db_name}"
+                ),
+            )
+        # Replicas: fill user/password from Toolforge if not set
+        if self.tool_replica_user and not self.wiki_replicas_user:
+            object.__setattr__(self, "wiki_replicas_user", self.tool_replica_user)
+        if self.tool_replica_password and not self.wiki_replicas_password:
+            object.__setattr__(self, "wiki_replicas_password", self.tool_replica_password)
 
     @property
     def cors_origin_list(self) -> list[str]:
@@ -91,6 +122,10 @@ class Settings(BaseSettings):
         repo_config = _REPO_ROOT / "config"
         if repo_config.is_dir():
             return repo_config
+        # Buildpack: code may live under /workspace with config at repo root
+        workspace_config = Path("/workspace/config")
+        if workspace_config.is_dir():
+            return workspace_config
         return _BACKEND_DIR / "config"
 
 

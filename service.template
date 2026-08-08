@@ -1,0 +1,4 @@
+# https://wikitech.wikimedia.org/wiki/Help:Toolforge/Web#service.template
+type: buildservice
+mount: none
+# health-check-path: /health
