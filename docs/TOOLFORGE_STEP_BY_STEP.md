@@ -90,16 +90,16 @@ toolforge build show
 ## 5. Start webservice
 
 ```bash
-# With service.template, this is enough:
-toolforge webservice start
-
-# Or explicitly:
+# Always use buildservice (plain "webservice start" looks for public_html / lighttpd)
 toolforge webservice buildservice start --mount=none
 ```
 
 ```bash
 toolforge webservice status
 toolforge webservice logs
+# logs should say: Using worker: uvicorn.workers.UvicornWorker
+# NOT: Using worker: sync
+
 curl -sS https://wikisignals.toolforge.org/health
 ```
 
