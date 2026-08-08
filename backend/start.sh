@@ -14,7 +14,8 @@ if [ "${ENVIRONMENT:-}" = "production" ] && echo "${DATABASE_URL:-}" | grep -q '
   exit 1
 fi
 
-exec gunicorn \
+# Use python -m so we don't depend on PATH containing /usr/local/bin
+exec python -m gunicorn \
   --bind "0.0.0.0:${PORT}" \
   --workers "${WORKERS}" \
   --worker-class uvicorn.workers.UvicornWorker \
