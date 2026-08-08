@@ -10,6 +10,10 @@ web: bash -c "export HOME=/tmp TMPDIR=/tmp XDG_CACHE_HOME=/tmp/.cache && cd back
 migrate: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec alembic upgrade head"
 seed: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec python -m app.jobs.cli seed-registry"
 bootstrap: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec python -m app.jobs.cli bootstrap --project fa.wikipedia --months 24"
+# ~5 years of official AQS activity context (one-time / rare — not daily)
+bootstrap-5y: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec python -m app.jobs.cli bootstrap --project fa.wikipedia --months 60"
+# Same without re-seeding registry (if migrate+seed already done)
+ingest-5y: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec python -m app.jobs.cli ingest --project fa.wikipedia --since 2021-01-01"
 collect-health: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec python -m app.jobs.cli collect-health --project fa.wikipedia --months 2"
 daily: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec python -m app.jobs.cli daily --project fa.wikipedia"
 check: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec python -m app.jobs.cli check-connectivity"

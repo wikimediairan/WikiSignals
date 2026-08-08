@@ -185,26 +185,34 @@ curl -sS https://YOURTOOL.toolforge.org/health
 
 ## 5. One-time bootstrap (history + registry)
 
-Run **once** (or after major metric catalog changes). This is heavier than the daily job — do **not** schedule full multi-year bootstrap every day.
+Run **once** (or after major metric catalog changes). Heavier than the daily job — **do not** schedule multi-year bootstrap every day.
+
+Use **Procfile** command names (buildpack image):
 
 ```bash
+# ~2 years AQS
 toolforge jobs run wikisignals-bootstrap \
-  --image tool-YOURTOOL/tool-YOURTOOL:latest \
-  --command "bash -c 'cd backend && alembic upgrade head && python -m app.jobs.cli bootstrap --project fa.wikipedia --months 24'" \
-  --wait \
-  --emails onfailure
-```
+  --image tool-wikisignals/tool-wikisignals:latest \
+  --command "bootstrap" \
+  --wait --timeout 7200 --emails onfailure
 
-If the image workdir already is `backend/`, drop the `cd backend &&`.
+# ~5 years AQS (60 months) — once only
+toolforge jobs run wikisignals-bootstrap-5y \
+  --image tool-wikisignals/tool-wikisignals:latest \
+  --command "bootstrap-5y" \
+  --wait --timeout 14400 --emails onfailure
 
-Then collect health once:
+# Or explicit since-date ingest:
+toolforge jobs run wikisignals-ingest-5y \
+  --image tool-wikisignals/tool-wikisignals:latest \
+  --command "ingest-5y" \
+  --wait --timeout 14400 --emails onfailure
 
-```bash
+# Maintenance snapshots + recent admin logs
 toolforge jobs run wikisignals-health-init \
-  --image tool-YOURTOOL/tool-YOURTOOL:latest \
-  --command "python -m app.jobs.cli collect-health --project fa.wikipedia --months 2" \
-  --wait \
-  --emails onfailure
+  --image tool-wikisignals/tool-wikisignals:latest \
+  --command "collect-health" \
+  --wait --timeout 3600 --emails onfailure
 ```
 
 ---

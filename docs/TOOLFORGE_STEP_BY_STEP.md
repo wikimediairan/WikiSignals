@@ -132,14 +132,46 @@ toolforge jobs run wikisignals-check \
 
 ## 7. One-time data load
 
+### 7a. Official activity context from AQS (choose one)
+
+**~2 years (safer first run):**
+
 ```bash
-# AQS history (heavy — once)
 toolforge jobs run wikisignals-bootstrap \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "bootstrap" \
   --wait --timeout 7200 --emails onfailure
+```
 
-# Maintenance + admin logs
+**~5 years (60 months of AQS — once, not daily):**
+
+```bash
+# Seeds registry if needed + pulls monthly AQS for fa.wikipedia (~60 months)
+toolforge jobs run wikisignals-bootstrap-5y \
+  --image tool-wikisignals/tool-wikisignals:latest \
+  --command "bootstrap-5y" \
+  --wait --timeout 14400 --emails onfailure
+```
+
+Or, if migrate + seed already succeeded and you only need AQS points:
+
+```bash
+# From 2021-01-01 to now (about 5 years depending on current date)
+toolforge jobs run wikisignals-ingest-5y \
+  --image tool-wikisignals/tool-wikisignals:latest \
+  --command "ingest-5y" \
+  --wait --timeout 14400 --emails onfailure
+```
+
+Use a real `USER_AGENT`. If you hit 403/429, wait and re-run — upserts are safe to retry.
+
+**What 5-year AQS gives you:** edits, active editors, pageviews, new pages, bot share inputs, etc.
+
+**What it does *not* give:** multi-year maintenance backlog history (categoryinfo is current size only; history builds from daily snapshots going forward). Admin log depth via API is still limited; use replicas later for deep admin/revert history.
+
+### 7b. Maintenance + admin logs (current / recent)
+
+```bash
 toolforge jobs run wikisignals-health \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "collect-health" \
@@ -150,6 +182,8 @@ toolforge jobs run wikisignals-health \
 
 ## 8. Daily job
 
+**Do not** schedule `bootstrap-5y` or `ingest-5y` daily. Only the light job:
+
 ```bash
 toolforge jobs run wikisignals-daily \
   --image tool-wikisignals/tool-wikisignals:latest \
@@ -158,6 +192,8 @@ toolforge jobs run wikisignals-daily \
   --timeout 1800 \
   --emails onfailure
 ```
+
+Daily only refreshes ~3 months of AQS + current maintenance snapshots + short admin log window.
 
 ---
 
