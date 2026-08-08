@@ -39,7 +39,7 @@ Browser → https://YOURTOOL.toolforge.org
 ## Prerequisites
 
 1. [Wikimedia developer account](https://wikitech.wikimedia.org/wiki/Help:Create_a_Wikimedia_developer_account)
-2. Tool account on [toolsadmin.wikimedia.org](https://toolsadmin.wikimedia.org/) (example name: `observatory`)
+2. Tool account on [toolsadmin.wikimedia.org](https://toolsadmin.wikimedia.org/) (example name: `wikisignals`)
 3. Git remote (GitLab `toolforge-repos` recommended)
 4. Toolforge membership / ability to `become YOURTOOL`
 
@@ -56,7 +56,7 @@ sql tools
 ```
 
 ```sql
-CREATE DATABASE sXXXXX__observatory
+CREATE DATABASE sXXXXX__wikisignals
   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- Replace sXXXXX with your tool login name (e.g. s56000)
 ```
@@ -72,7 +72,7 @@ cat ~/replica.my.cnf   # may include user/password used for both replicas and to
 Set `DATABASE_URL` (async driver):
 
 ```text
-mysql+aiomysql://USER:PASSWORD@tools.db.svc.wikimedia.cloud:3306/sXXXXX__observatory
+mysql+aiomysql://USER:PASSWORD@tools.db.svc.wikimedia.cloud:3306/sXXXXX__wikisignals
 ```
 
 Use **ToolsDB primary** for writes from jobs and the webservice. For long ad-hoc analytics against ToolsDB itself you may use the ToolsDB read replica host (`tools-readonly.db.svc.wikimedia.cloud`) — not required for this app.
@@ -96,7 +96,7 @@ toolforge envvars create FRONTEND_URL "https://YOURTOOL.toolforge.org"
 toolforge envvars create CORS_ORIGINS "https://YOURTOOL.toolforge.org"
 
 # ToolsDB
-toolforge envvars create DATABASE_URL "mysql+aiomysql://USER:PASS@tools.db.svc.wikimedia.cloud:3306/sXXXXX__observatory"
+toolforge envvars create DATABASE_URL "mysql+aiomysql://USER:PASS@tools.db.svc.wikimedia.cloud:3306/sXXXXX__wikisignals"
 
 # Polite HTTP pacing (seconds between outbound Wikimedia requests)
 toolforge envvars create HTTP_MIN_INTERVAL_SECONDS "0.75"
@@ -174,7 +174,7 @@ Health check:
 
 ```bash
 curl -sS https://YOURTOOL.toolforge.org/health
-# {"status":"ok","service":"observatory","frontend":"built",...}
+# {"status":"ok","service":"wikisignals","frontend":"built",...}
 ```
 
 ---
@@ -184,7 +184,7 @@ curl -sS https://YOURTOOL.toolforge.org/health
 Run **once** (or after major metric catalog changes). This is heavier than the daily job — do **not** schedule full multi-year bootstrap every day.
 
 ```bash
-toolforge jobs run observatory-bootstrap \
+toolforge jobs run wikisignals-bootstrap \
   --image tool-YOURTOOL/tool-YOURTOOL:latest \
   --command "bash -c 'cd backend && alembic upgrade head && python -m app.jobs.cli bootstrap --project fa.wikipedia --months 24'" \
   --wait \
@@ -196,7 +196,7 @@ If the image workdir already is `backend/`, drop the `cd backend &&`.
 Then collect health once:
 
 ```bash
-toolforge jobs run observatory-health-init \
+toolforge jobs run wikisignals-health-init \
   --image tool-YOURTOOL/tool-YOURTOOL:latest \
   --command "python -m app.jobs.cli collect-health --project fa.wikipedia --months 2" \
   --wait \
@@ -219,7 +219,7 @@ The **`daily`** command is designed to stay light:
 | Between projects | Pause **2–3s** |
 
 ```bash
-toolforge jobs run observatory-daily \
+toolforge jobs run wikisignals-daily \
   --image tool-YOURTOOL/tool-YOURTOOL:latest \
   --command "python -m app.jobs.cli daily" \
   --schedule "17 3 * * *" \
@@ -297,7 +297,7 @@ python -m app.jobs.cli collect-health --project fa.wikipedia
 - [ ] `USER_AGENT` has real contact  
 - [ ] `DOCS_ENABLED=false` in production  
 - [ ] `CORS_ORIGINS` is only your tool URL  
-- [ ] ToolsDB URL uses `sXXXXX__observatory`  
+- [ ] ToolsDB URL uses `sXXXXX__wikisignals`  
 - [ ] Frontend built into `backend/app/static`  
 - [ ] Bootstrap run once  
 - [ ] Daily job scheduled, not full bootstrap  

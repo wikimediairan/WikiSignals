@@ -107,7 +107,7 @@ ENVIRONMENT=production
 DOCS_ENABLED=false
 CORS_ORIGINS=https://YOURTOOL.toolforge.org
 USER_AGENT=WikiSignals/0.1 (https://github.com/wikimediairan/WikiSignals; you@real-email)
-DATABASE_URL=mysql+aiomysql://…@tools.db.svc.wikimedia.cloud:3306/sXXXXX__observatory
+DATABASE_URL=mysql+aiomysql://…@tools.db.svc.wikimedia.cloud:3306/sXXXXX__wikisignals
 # Never enable debug or SQL echo
 LOG_LEVEL=INFO
 ```
@@ -116,7 +116,7 @@ Optional:
 
 ```bash
 # If Redis is ever added
-REDIS_KEY_PREFIX=observatory-YOURTOOL:
+REDIS_KEY_PREFIX=wikisignals-YOURTOOL:
 ```
 
 ---
@@ -144,7 +144,7 @@ Rotate credentials if leaked via git history.
 
 ## 8. Incident response (Toolforge)
 
-1. Disable daily job: `toolforge jobs delete observatory-daily`  
+1. Disable daily job: `toolforge jobs delete wikisignals-daily`  
 2. If abusive outbound traffic: set `HTTP_MIN_INTERVAL_SECONDS=5`, `DAILY_MAX_PROJECTS=1`  
 3. Rotate ToolsDB/replica passwords  
 4. Check job logs for unexpected hosts (should only be Wikimedia)  

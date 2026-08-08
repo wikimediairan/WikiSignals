@@ -56,7 +56,7 @@ Push this repository (including root `Dockerfile`, `backend/`, `config/`, and bu
 Toolforge often will not run a full Node build reliably. Commit the SPA into the image:
 
 ```bash
-cd /path/to/observatory
+cd /path/to/WikiSignals
 cd frontend
 npm ci
 npm run build
@@ -97,10 +97,10 @@ sql tools
 In the MySQL prompt:
 
 ```sql
-CREATE DATABASE sXXXXX__observatory
+CREATE DATABASE sXXXXX__wikisignals
   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- use YOUR real sXXXXX (same as tool user)
-SHOW DATABASES LIKE '%observatory%';
+SHOW DATABASES LIKE '%wikisignals%';
 EXIT;
 ```
 
@@ -162,7 +162,7 @@ toolforge envvars create CONFIG_DIR "/config"
 ```bash
 # password from ~/replica.my.cnf (or maintain-dbusers docs for your tool)
 toolforge envvars create DATABASE_URL \
-  "mysql+aiomysql://sXXXXX:PASSWORD@tools.db.svc.wikimedia.cloud:3306/sXXXXX__observatory"
+  "mysql+aiomysql://sXXXXX:PASSWORD@tools.db.svc.wikimedia.cloud:3306/sXXXXX__wikisignals"
 ```
 
 ### Step 10 — Polite HTTP pacing (daily + bootstrap)
@@ -290,7 +290,7 @@ toolforge build list
 ### Step 16 — Migrate schema + seed registry (no network-heavy ingest)
 
 ```bash
-toolforge jobs run observatory-migrate \
+toolforge jobs run wikisignals-migrate \
   --image tool-YOURTOOL/tool-YOURTOOL:latest \
   --command "bash -lc 'alembic upgrade head && python -m app.jobs.cli seed-registry'" \
   --wait \
@@ -306,7 +306,7 @@ If the job cannot find `alembic`, the workdir may differ; try:
 ### Step 17 — Connectivity check (User-Agent)
 
 ```bash
-toolforge jobs run observatory-ping \
+toolforge jobs run wikisignals-ping \
   --image tool-YOURTOOL/tool-YOURTOOL:latest \
   --command "python -m app.jobs.cli check-connectivity" \
   --wait \
@@ -321,7 +321,7 @@ Both AQS and MediaWiki must print `OK`. If 403: fix `USER_AGENT` (real email/URL
 
 ```bash
 # 24 months (safer first try)
-toolforge jobs run observatory-bootstrap-aqs \
+toolforge jobs run wikisignals-bootstrap-aqs \
   --image tool-YOURTOOL/tool-YOURTOOL:latest \
   --command "python -m app.jobs.cli bootstrap --project fa.wikipedia --months 24" \
   --wait \
@@ -332,7 +332,7 @@ toolforge jobs run observatory-bootstrap-aqs \
 For ~5 years later (optional):
 
 ```bash
-toolforge jobs run observatory-bootstrap-aqs-5y \
+toolforge jobs run wikisignals-bootstrap-aqs-5y \
   --image tool-YOURTOOL/tool-YOURTOOL:latest \
   --command "python -m app.jobs.cli ingest --project fa.wikipedia --since 2021-01-01" \
   --wait \
@@ -347,7 +347,7 @@ Use a valid `USER_AGENT` and be patient if rate-limited.
 Requires maintenance tracks in `config/projects/fa.wikipedia.yaml` (`enabled: true` + real category). That config is **inside the image**, so edit git → rebuild → then:
 
 ```bash
-toolforge jobs run observatory-health-init \
+toolforge jobs run wikisignals-health-init \
   --image tool-YOURTOOL/tool-YOURTOOL:latest \
   --command "python -m app.jobs.cli collect-health --project fa.wikipedia --months 2" \
   --wait \
@@ -370,7 +370,7 @@ curl -sS "https://YOURTOOL.toolforge.org/api/v1/projects/fa.wikipedia/metrics/ed
 ### Step 21 — Register daily update
 
 ```bash
-toolforge jobs run observatory-daily \
+toolforge jobs run wikisignals-daily \
   --image tool-YOURTOOL/tool-YOURTOOL:latest \
   --command "python -m app.jobs.cli daily --project fa.wikipedia" \
   --schedule "17 3 * * *" \
@@ -389,7 +389,7 @@ List / logs:
 
 ```bash
 toolforge jobs list
-toolforge jobs logs observatory-daily
+toolforge jobs logs wikisignals-daily
 ```
 
 ### Step 22 — (Optional) expand later
@@ -398,8 +398,8 @@ When stable for a week:
 
 ```bash
 # All enabled projects (still capped by DAILY_MAX_PROJECTS)
-toolforge jobs delete observatory-daily
-toolforge jobs run observatory-daily \
+toolforge jobs delete wikisignals-daily
+toolforge jobs run wikisignals-daily \
   --image tool-YOURTOOL/tool-YOURTOOL:latest \
   --command "python -m app.jobs.cli daily" \
   --schedule "17 3 * * *" \
@@ -420,7 +420,7 @@ toolforge jobs run observatory-daily \
 5. Either wait for daily job, or:
 
 ```bash
-toolforge jobs run observatory-reload \
+toolforge jobs run wikisignals-reload \
   --image tool-YOURTOOL/tool-YOURTOOL:latest \
   --command "python -m app.jobs.cli collect-health --project fa.wikipedia --months 1" \
   --wait
@@ -437,7 +437,7 @@ toolforge jobs run observatory-reload \
 5. Re-run migrate if new Alembic revisions:  
 
 ```bash
-toolforge jobs run observatory-migrate \
+toolforge jobs run wikisignals-migrate \
   --image tool-YOURTOOL/tool-YOURTOOL:latest \
   --command "alembic upgrade head" \
   --wait
@@ -462,7 +462,7 @@ python -m app.jobs.cli check-connectivity   # inside a job
 - [ ] Tool account created  
 - [ ] Code on GitLab toolforge-repos  
 - [ ] Frontend built and committed under `backend/app/static`  
-- [ ] ToolsDB `sXXXXX__observatory` created  
+- [ ] ToolsDB `sXXXXX__wikisignals` created  
 - [ ] `USER_AGENT` real contact  
 - [ ] `DATABASE_URL` set  
 - [ ] `DOCS_ENABLED=false`, tight `CORS_ORIGINS`  
