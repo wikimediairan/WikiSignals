@@ -109,6 +109,8 @@ Expect `"status":"ok"` and `"service":"wikisignals"`.
 
 ## 6. Migrate + seed (jobs use Procfile entries)
 
+> **Note:** On current Toolforge, `--timeout` is only valid for **scheduled** jobs (`--schedule`). One-shot jobs use `--wait` without `--timeout`.
+
 Image name is usually `tool-wikisignals/tool-wikisignals:latest`.
 
 ```bash
@@ -140,7 +142,7 @@ toolforge jobs run wikisignals-check \
 toolforge jobs run wikisignals-bootstrap \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "bootstrap" \
-  --wait --timeout 7200 --emails onfailure
+  --wait --emails onfailure
 ```
 
 **~5 years (60 months of AQS — once, not daily):**
@@ -150,7 +152,7 @@ toolforge jobs run wikisignals-bootstrap \
 toolforge jobs run wikisignals-bootstrap-5y \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "bootstrap-5y" \
-  --wait --timeout 14400 --emails onfailure
+  --wait --emails onfailure
 ```
 
 Or, if migrate + seed already succeeded and you only need AQS points:
@@ -160,7 +162,7 @@ Or, if migrate + seed already succeeded and you only need AQS points:
 toolforge jobs run wikisignals-ingest-5y \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "ingest-5y" \
-  --wait --timeout 14400 --emails onfailure
+  --wait --emails onfailure
 ```
 
 Use a real `USER_AGENT`. If you hit 403/429, wait and re-run — upserts are safe to retry.
@@ -175,7 +177,7 @@ Use a real `USER_AGENT`. If you hit 403/429, wait and re-run — upserts are saf
 toolforge jobs run wikisignals-health \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "collect-health" \
-  --wait --timeout 3600 --emails onfailure
+  --wait --emails onfailure
 ```
 
 ---

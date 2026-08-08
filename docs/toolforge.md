@@ -194,25 +194,25 @@ Use **Procfile** command names (buildpack image):
 toolforge jobs run wikisignals-bootstrap \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "bootstrap" \
-  --wait --timeout 7200 --emails onfailure
+  --wait --emails onfailure
 
 # ~5 years AQS (60 months) — once only
 toolforge jobs run wikisignals-bootstrap-5y \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "bootstrap-5y" \
-  --wait --timeout 14400 --emails onfailure
+  --wait --emails onfailure
 
 # Or explicit since-date ingest:
 toolforge jobs run wikisignals-ingest-5y \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "ingest-5y" \
-  --wait --timeout 14400 --emails onfailure
+  --wait --emails onfailure
 
 # Maintenance snapshots + recent admin logs
 toolforge jobs run wikisignals-health-init \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "collect-health" \
-  --wait --timeout 3600 --emails onfailure
+  --wait --emails onfailure
 ```
 
 ---
