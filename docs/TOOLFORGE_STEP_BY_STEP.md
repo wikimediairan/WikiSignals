@@ -234,22 +234,50 @@ Root `Dockerfile` copies `backend/` + `config/` and sets `CONFIG_DIR=/config`.
 ```bash
 # Correct order: TYPE, then ACTION, then --mount
 # (putting --mount between TYPE and ACTION makes the CLI treat "buildservice" as ACTION)
-toolforge webservice buildservice start --mount=none
+toolforge webservice buildservice start --mount=none --health-check-path /health
 
 # later:
 toolforge webservice restart --mount=none
 toolforge webservice status
+toolforge webservice logs
 ```
 
 If your CLI rejects `buildservice` as invalid ACTION, use:
 
 ```bash
-toolforge webservice start --mount=none
+toolforge webservice start --mount=none --health-check-path /health
 # or with an explicit image:
-# toolforge webservice --buildservice-image tool-wikisignals/tool-wikisignals:latest start --mount=none
+# toolforge webservice --buildservice-image tool-wikisignals/tool-wikisignals:latest start --mount=none --health-check-path /health
 ```
 
 WikiSignals only needs network access to ToolsDB, AQS, and MediaWiki/replicas — not the shared NFS home for the running web process. Prefer `--mount=none` over `--mount=all`.
+
+#### If you see `no healthy upstream`
+
+The ingress cannot reach a live process. On the bastion:
+
+```bash
+toolforge webservice status
+toolforge webservice logs
+# or: kubectl get pods  (if available on your account)
+```
+
+Common causes:
+
+| Cause | Fix |
+|-------|-----|
+| App crashed on start | Read `webservice logs`; often bad `DATABASE_URL` |
+| Image not rebuilt after code change | `toolforge build start https://github.com/wikimediairan/WikiSignals.git` then restart |
+| Wrong start command / not listening on `$PORT` | Image uses `/app/start.sh` which binds `0.0.0.0:$PORT` |
+| Migrations not applied | Run `alembic upgrade head` job (web can start without tables, but fix soon) |
+| Missing envvars | `toolforge envvars list` — need `DATABASE_URL`, `USER_AGENT` |
+
+After fixing env or image:
+
+```bash
+toolforge webservice stop
+toolforge webservice buildservice start --mount=none --health-check-path /health
+```
 
 ### Step 15 — Smoke-check the live tool
 

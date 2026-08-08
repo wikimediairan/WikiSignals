@@ -27,10 +27,23 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     settings = get_settings()
     logging.basicConfig(level=getattr(logging, settings.log_level.upper(), logging.INFO))
-    init_engine()
+    # Creating the engine must not block startup on a live DB connection.
+    try:
+        init_engine()
+        logger.info(
+            "WikiSignals starting env=%s default_project=%s",
+            settings.environment,
+            settings.default_project_id,
+        )
+    except Exception:
+        logger.exception("Failed to init database engine — check DATABASE_URL")
+        raise
     yield
-    engine = get_engine()
-    await engine.dispose()
+    try:
+        engine = get_engine()
+        await engine.dispose()
+    except Exception:
+        logger.exception("Error disposing database engine")
 
 
 def create_app() -> FastAPI:
