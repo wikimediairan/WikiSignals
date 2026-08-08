@@ -232,14 +232,24 @@ Root `Dockerfile` copies `backend/` + `config/` and sets `CONFIG_DIR=/config`.
 ### Step 14 — Start the webservice
 
 ```bash
-# --mount=none is required for buildservice tools (recommended: no NFS)
-toolforge webservice buildservice --mount=none start
+# Correct order: TYPE, then ACTION, then --mount
+# (putting --mount between TYPE and ACTION makes the CLI treat "buildservice" as ACTION)
+toolforge webservice buildservice start --mount=none
+
 # later:
-# toolforge webservice --mount=none restart
+toolforge webservice restart --mount=none
 toolforge webservice status
 ```
 
-WikiSignals only needs network access to ToolsDB, AQS, and MediaWiki/replicas — not the shared NFS home for the running web process. Use `--mount=none` unless you have a specific reason to mount NFS (`--mount=all`).
+If your CLI rejects `buildservice` as invalid ACTION, use:
+
+```bash
+toolforge webservice start --mount=none
+# or with an explicit image:
+# toolforge webservice --buildservice-image tool-wikisignals/tool-wikisignals:latest start --mount=none
+```
+
+WikiSignals only needs network access to ToolsDB, AQS, and MediaWiki/replicas — not the shared NFS home for the running web process. Prefer `--mount=none` over `--mount=all`.
 
 ### Step 15 — Smoke-check the live tool
 
@@ -420,7 +430,7 @@ toolforge jobs run wikisignals-daily \
 1. Edit `config/projects/fa.wikipedia.yaml` in git  
 2. Commit + push  
 3. `toolforge build start …`  
-4. `toolforge webservice --mount=none restart`  
+4. `toolforge webservice restart --mount=none`  
 5. Either wait for daily job, or:
 
 ```bash
@@ -437,7 +447,7 @@ toolforge jobs run wikisignals-reload \
 1. Rebuild frontend if UI changed; commit `backend/app/static`  
 2. Push  
 3. `toolforge build start …`  
-4. `toolforge webservice --mount=none restart`  
+4. `toolforge webservice restart --mount=none`  
 5. Re-run migrate if new Alembic revisions:  
 
 ```bash
@@ -452,7 +462,7 @@ toolforge jobs run wikisignals-migrate \
 ```bash
 toolforge webservice status
 toolforge webservice stop
-toolforge webservice buildservice --mount=none start
+toolforge webservice buildservice start --mount=none
 toolforge jobs list
 toolforge jobs delete JOBNAME
 toolforge envvars list
