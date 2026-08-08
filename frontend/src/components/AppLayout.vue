@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { applyDocumentLocale, type Locale } from '../i18n'
+import { applyDocumentLocale } from '../i18n'
 import { useFilterRouteSync } from '../stores/filters'
 import AppFooter from './AppFooter.vue'
 
 const { t, locale } = useI18n()
 useFilterRouteSync()
+
+// UI is English-only for now (Persian strings were poor quality).
+onMounted(() => {
+  locale.value = 'en'
+  applyDocumentLocale('en')
+})
+applyDocumentLocale('en')
 
 const theme = computed({
   get: () => document.documentElement.getAttribute('data-theme') || 'light',
@@ -15,16 +22,6 @@ const theme = computed({
     else document.documentElement.setAttribute('data-theme', v)
   },
 })
-
-watch(
-  locale,
-  (v) => applyDocumentLocale(v as Locale),
-  { immediate: true },
-)
-
-function setLocale(l: Locale) {
-  locale.value = l
-}
 </script>
 
 <template>
@@ -49,9 +46,7 @@ function setLocale(l: Locale) {
         <router-link to="/privacy">{{ t('nav.privacy') }}</router-link>
       </nav>
       <div class="lang-switch">
-        <button class="btn" type="button" @click="setLocale('en')">EN</button>
-        <button class="btn" type="button" @click="setLocale('fa')">FA</button>
-        <button class="btn" type="button" @click="theme = theme === 'dark' ? 'light' : 'dark'">
+        <button class="btn" type="button" title="Theme" @click="theme = theme === 'dark' ? 'light' : 'dark'">
           ◐
         </button>
       </div>

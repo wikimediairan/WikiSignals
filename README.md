@@ -38,7 +38,7 @@ Signals are **interpretable** (improving / stable / needs attention). There is *
 |-------|------------|
 | Backend | Python 3.12, FastAPI, SQLAlchemy async, Alembic |
 | Database | MariaDB (ToolsDB) / SQLite for local tests |
-| Frontend | Vue 3, TypeScript, ECharts, vue-i18n (EN + FA, RTL) |
+| Frontend | Vue 3, TypeScript, ECharts, vue-i18n (English UI; FA deferred) |
 | Sources | AQS, MediaWiki API, optional Toolforge wiki replicas |
 
 ## Quick start (local)
