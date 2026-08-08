@@ -116,34 +116,37 @@ class Settings(BaseSettings):
 
     @property
     def resolved_config_dir(self) -> Path:
-        """Find config/ containing projects/*.yaml (buildpack, docker, or local)."""
+        """Find config/ containing projects/*.yaml (buildpack, docker, or local).
+
+        Never trust CONFIG_DIR alone if it has no project YAMLs (Toolforge often
+        still has CONFIG_DIR=/config from older Docker docs).
+        """
         candidates: list[Path] = []
         if self.config_dir:
             candidates.append(Path(self.config_dir))
         candidates.extend(
             [
-                _REPO_ROOT / "config",
-                Path("/workspace/config"),
+                _REPO_ROOT / "config",  # sibling of backend/ when app is backend/app
+                Path("/workspace/config"),  # Toolforge buildpack workspace
                 Path.cwd() / "config",
-                Path.cwd().parent / "config",
-                Path("/config"),
+                Path.cwd().parent / "config",  # when cwd is backend/
+                Path("/layers"),  # placeholder skipped below
+                Path("/config"),  # only if it actually has YAMLs
                 _BACKEND_DIR / "config",
             ]
         )
+        # Prefer any candidate that has project YAML files
         for path in candidates:
+            if path == Path("/layers"):
+                continue
             try:
-                if path.is_dir() and (path / "projects").is_dir() and any((path / "projects").glob("*.yaml")):
-                    return path
+                projects = path / "projects"
+                if path.is_dir() and projects.is_dir() and any(projects.glob("*.yaml")):
+                    return path.resolve()
             except OSError:
                 continue
-        # Last resort: first existing directory even if empty (callers should fail loudly)
-        for path in candidates:
-            try:
-                if path.is_dir():
-                    return path
-            except OSError:
-                continue
-        return _REPO_ROOT / "config"
+        # Fall back to repo-root config even if empty (seed will fail loudly)
+        return (_REPO_ROOT / "config").resolve()
 
 
 @lru_cache
