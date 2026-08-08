@@ -1,0 +1,26 @@
+id: commons.wikimedia
+domain: commons.wikimedia.org
+dbname: commonswiki
+language: mul
+language_script: Latn
+text_direction: ltr
+family: commons
+display_name: Wikimedia Commons
+content_namespaces: [6]
+default_for_workspace: false
+aqs_project: commons.wikimedia.org
+pageviews_project: commons.wikimedia
+enabled: true
+sort_order: 20
+features:
+  pageviews: true
+  cohorts: false
+  reverts: true
+  unique_devices: true
+  mediarequests: true
+related_projects:
+  - fa.wikipedia
+campaign_filters:
+  # Optional filters for Iran/Persian-related Commons activity (config data, not core logic)
+  commons_categories: []
+notes: Global media repository. Campaign filters are optional configuration.

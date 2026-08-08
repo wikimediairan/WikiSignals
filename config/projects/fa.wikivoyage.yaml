@@ -1,0 +1,21 @@
+id: fa.wikivoyage
+domain: fa.wikivoyage.org
+dbname: fawikivoyage
+language: fa
+language_script: Arab
+text_direction: rtl
+family: wikivoyage
+display_name: Persian Wikivoyage
+content_namespaces: [0]
+default_for_workspace: false
+aqs_project: fa.wikivoyage.org
+pageviews_project: fa.wikivoyage
+enabled: true
+sort_order: 4
+features:
+  pageviews: true
+  cohorts: true
+  reverts: true
+  unique_devices: true
+related_projects:
+  - fa.wikipedia

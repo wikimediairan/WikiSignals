@@ -1,0 +1,187 @@
+{
+  "app": {
+    "title": "WikiSignals",
+    "tagline": "Community health and capacity analytics for Wikimedia"
+  },
+  "footer": {
+    "createdWith": "Created with ❤️ by",
+    "github": "Source on GitHub",
+    "toolforge": "Served via Wikimedia Toolforge",
+    "licensePrefix": "Licensed under",
+    "licenseName": "GNU GPL v3 or later"
+  },
+  "nav": {
+    "health": "Health",
+    "capacity": "Capacity",
+    "maintenance": "Maintenance",
+    "governance": "Governance",
+    "admin": "Admin workload",
+    "conflict": "Conflict signals",
+    "automation": "Automation",
+    "context": "Official context",
+    "compare": "Compare",
+    "history": "History",
+    "methodology": "Methodology",
+    "privacy": "Privacy"
+  },
+  "filters": {
+    "project": "Project",
+    "start": "Start",
+    "end": "End",
+    "interval": "Interval",
+    "apply": "Apply",
+    "day": "Daily",
+    "week": "Weekly",
+    "month": "Monthly",
+    "quarter": "Quarterly",
+    "year": "Yearly"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "noData": "No data for this selection",
+    "exportCsv": "Export CSV",
+    "exportJson": "Export JSON",
+    "dataTable": "Data table",
+    "current": "Latest",
+    "change": "vs previous period",
+    "utc": "UTC",
+    "unavailable": "Unavailable",
+    "experimental": "Experimental",
+    "disclaimerCompare": "Raw counts do not make one community better than another.",
+    "metric": "Metric",
+    "projects": "Projects"
+  },
+  "health": {
+    "title": "Community health signals",
+    "intro": "Interpretable operational signals — not a single health score. Each signal has a transparent rule and drill-down.",
+    "vsWikistats": "Wikistats measures how much activity is happening. This observatory focuses on the pressures that activity creates: maintenance backlog, admin workload, process queues, conflict signals, and automation dependence.",
+    "signals": "Signal board",
+    "drill": "Details",
+    "contextTitle": "Official activity context",
+    "contextIntro": "These series are consumed from Wikimedia Analytics (Wikistats family) as denominators and context — not the product focus.",
+    "openContext": "Open official context page",
+    "configuredTracks": "Configured maintenance tracks",
+    "processTracks": "Configured process tracks",
+    "status": {
+      "improving": "Improving",
+      "stable": "Stable",
+      "needs_attention": "Needs attention",
+      "unavailable": "Unavailable"
+    },
+    "domains": {
+      "capacity": "Community capacity",
+      "maintenance": "Maintenance",
+      "admin": "Administrative workload",
+      "conflict": "Conflict signals",
+      "automation": "Automation",
+      "governance": "Governance",
+      "context": "Context"
+    }
+  },
+  "domains": {
+    "capacityIntro": "Active editor capacity from official analytics, used as denominators for workload ratios.",
+    "maintenanceIntro": "Configured maintenance queues and backlog per active editor. Categories are project configuration — never hard-coded language assumptions.",
+    "governanceIntro": "Local process queues (deletion discussions, noticeboards, etc.) when configured for this project.",
+    "adminIntro": "Aggregate administrative log activity. Workload distribution, not administrator rankings.",
+    "conflictIntro": "Revert and conflict signals at system level. High rates need interpretation — they are not diagnoses.",
+    "automationIntro": "Bot edit share and related automation dependence. Co-trends with backlog are not automatic causation."
+  },
+  "context": {
+    "title": "Official activity context",
+    "intro": "Authoritative activity statistics from Wikimedia Analytics / Wikistats-compatible APIs. Shown for context and as denominators. This page is not the primary purpose of the Community Health Observatory."
+  },
+  "compare": {
+    "title": "Cross-project comparison",
+    "intro": "Compare signals carefully. Policies, bots, and workflows differ — raw counts are not rankings."
+  },
+  "history": {
+    "title": "Historical trends",
+    "intro": "Long-period exploration with manually supplied community event annotations. Causality is not inferred automatically.",
+    "annotations": "Annotations"
+  },
+  "methodology": {
+    "title": "Methodology",
+    "intro": "Every signal has a canonical ID, definition, formula, source, and caveats. Official metrics preserve provenance.",
+    "definition": "Definition",
+    "method": "Methodology",
+    "formula": "Formula",
+    "numerator": "Numerator",
+    "denominator": "Denominator",
+    "source": "Source",
+    "caveats": "Caveats"
+  },
+  "privacy": {
+    "title": "Privacy & ethics",
+    "body": "This product analyzes public Wikimedia contribution data in aggregate form. It must not become a volunteer-surveillance platform. We do not build individual ranking systems, admin scoreboards, or demographic inference."
+  },
+  "funnel": {
+    "title": "New editor funnel (deprecated here)",
+    "intro": "Detailed newcomer analytics belong to the New Editor Health Dashboard. This page remains only for compatibility.",
+    "requiresReplicas": "Use the dedicated New Editor Health product for cohort analysis."
+  },
+  "metrics": {
+    "edits": {
+      "total": "Total edits (official)",
+      "user": "Human edits (official)",
+      "group_bot": "Group-bot edits (official)",
+      "name_bot": "Name-bot edits (official)",
+      "anonymous": "Anonymous edits (official)"
+    },
+    "editors": {
+      "active": "Active editors (official)",
+      "highly_active": "Highly active editors (official)",
+      "new_accounts": "New accounts (official)",
+      "activity_1_4": "Editors with 1–4 edits",
+      "activity_5_24": "Editors with 5–24 edits",
+      "activity_25_99": "Editors with 25–99 edits",
+      "returning": "Returning editors"
+    },
+    "content": {
+      "pages_created": "Pages created (official)",
+      "pages_created_content": "Content pages created (official)",
+      "pages_edited": "Pages edited (official)",
+      "pages_deleted": "Pages deleted"
+    },
+    "readers": {
+      "pageviews": "Page views (official)",
+      "unique_devices": "Unique devices (official)"
+    },
+    "moderation": {
+      "blocks": "Blocks"
+    },
+    "admin": {
+      "blocks": "Blocks",
+      "unblocks": "Unblocks",
+      "protections": "Protections",
+      "unprotections": "Unprotections",
+      "deletions": "Deletions",
+      "undeletions": "Undeletions",
+      "moves": "Page moves",
+      "rights_changes": "Rights changes",
+      "actions_total": "Admin actions (total)",
+      "actions_per_active_editor": "Admin actions per active editor"
+    },
+    "maintenance": {
+      "open_total": "Maintenance backlog (configured)",
+      "backlog_per_active_editor": "Backlog per active editor"
+    },
+    "automation": {
+      "bot_edit_share": "Bot edit share"
+    },
+    "reverts": {
+      "count": "Reverted edits",
+      "rate": "Revert rate",
+      "newcomer_rate": "Newcomer revert rate"
+    },
+    "funnel": {
+      "accounts": "New accounts (cohort)",
+      "first_edit": "Made a first edit",
+      "second_edit": "Made a second edit",
+      "active_7d": "Active within 7 days",
+      "active_30d": "Active within 30 days",
+      "active_90d": "Active within 90 days",
+      "active_180d": "Active within 180 days"
+    }
+  }
+}

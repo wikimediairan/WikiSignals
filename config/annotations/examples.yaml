@@ -1,0 +1,12 @@
+# Manually curated community-event annotations (examples).
+# Do not infer causality automatically in the product.
+annotations:
+  - project_id: fa.wikipedia
+    start_date: "2020-03-01"
+    end_date: "2020-06-30"
+    title: COVID-19 editing period (illustrative)
+    description: >
+      Example annotation for a period of elevated global wiki activity.
+      Replace with community-verified campaign dates as appropriate.
+    source_url: null
+    created_by: seed

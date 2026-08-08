@@ -1,0 +1,39 @@
+id: tr.wikipedia
+domain: tr.wikipedia.org
+dbname: trwiki
+language: tr
+language_script: Latn
+text_direction: ltr
+family: wikipedia
+display_name: Turkish Wikipedia
+content_namespaces: [0]
+default_for_workspace: false
+aqs_project: tr.wikipedia.org
+pageviews_project: tr.wikipedia
+enabled: true
+sort_order: 50
+features:
+  pageviews: true
+  cohorts: false
+  reverts: true
+  unique_devices: true
+  health: true
+related_projects: []
+notes: Comparison peer project. Health tracks disabled until local categories are configured.
+health:
+  admin_groups: [sysop]
+  bot_groups: [bot]
+  maintenance_tracks: []
+  process_tracks: []
+  protection:
+    enabled: true
+  reverts:
+    enabled: true
+    methods: [replica]
+  signal_thresholds:
+    default_mom_pct:
+      attention_above: 15
+      improving_below: -5
+  new_editor_health:
+    url: null
+    show_context_cards: true

@@ -1,0 +1,94 @@
+id: fa.wikipedia
+domain: fa.wikipedia.org
+dbname: fawiki
+language: fa
+language_script: Arab
+text_direction: rtl
+family: wikipedia
+display_name: Persian Wikipedia
+content_namespaces: [0]
+default_for_workspace: true
+aqs_project: fa.wikipedia.org
+pageviews_project: fa.wikipedia
+enabled: true
+sort_order: 1
+features:
+  pageviews: true
+  cohorts: false
+  reverts: true
+  unique_devices: true
+  health: true
+related_projects:
+  - fa.wiktionary
+  - fa.wikisource
+  - fa.wikivoyage
+  - commons.wikimedia
+  - wikidata
+campaign_filters:
+  commons_categories: []
+  wikidata_items: []
+notes: >
+  Default landing project for the Persian-language Wikimedia workspace.
+  Community-health tracks are configuration-driven; categories must be verified locally.
+health:
+  admin_groups: [sysop]
+  bot_groups: [bot]
+  # Maintenance tracks: set category titles only after verification on the live wiki.
+  # kind=category uses MediaWiki categoryinfo (page count).
+  maintenance_tracks:
+    - id: needs_citations
+      kind: category
+      category: مقاله‌های بدون منبع
+      label: Articles needing citations
+      enabled: true
+      notes: "Set category to the local tracking category title (without Category prefix) after verification."
+    - id: needs_cleanup
+      kind: category
+      category: null
+      label: Articles needing cleanup
+      enabled: false
+      notes: Populate with verified local cleanup category.
+    - id: orphans
+      kind: category
+      category: null
+      label: Orphaned pages
+      enabled: false
+    - id: needs_wikification
+      kind: category
+      category: null
+      label: Pages needing wikification
+      enabled: false
+  process_tracks:
+    - id: deletion_discussions
+      kind: category
+      category: null
+      label: Deletion discussions (open)
+      enabled: false
+      notes: Point at the local open-deletion discussion category or process page list.
+    - id: admin_noticeboard
+      kind: category
+      category: null
+      label: Administrator noticeboard queue
+      enabled: false
+  protection:
+    enabled: true
+  reverts:
+    enabled: true
+    methods: [replica, experimental_tag]
+  signal_thresholds:
+    default_mom_pct:
+      attention_above: 15
+      improving_below: -5
+    maintenance_backlog_mom_pct:
+      attention_above: 15
+      improving_below: -5
+    admin_actions_mom_pct:
+      attention_above: 25
+      improving_below: -10
+    bot_edit_share_mom_pct:
+      attention_above: 20
+      improving_below: -10
+  new_editor_health:
+    url: null
+    show_context_cards: true
+    note: Detailed newcomer analytics live in the New Editor Health Dashboard product.

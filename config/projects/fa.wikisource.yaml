@@ -1,0 +1,21 @@
+id: fa.wikisource
+domain: fa.wikisource.org
+dbname: fawikisource
+language: fa
+language_script: Arab
+text_direction: rtl
+family: wikisource
+display_name: Persian Wikisource
+content_namespaces: [0]
+default_for_workspace: false
+aqs_project: fa.wikisource.org
+pageviews_project: fa.wikisource
+enabled: true
+sort_order: 3
+features:
+  pageviews: true
+  cohorts: true
+  reverts: true
+  unique_devices: true
+related_projects:
+  - fa.wikipedia

@@ -1,0 +1,21 @@
+id: fa.wiktionary
+domain: fa.wiktionary.org
+dbname: fawiktionary
+language: fa
+language_script: Arab
+text_direction: rtl
+family: wiktionary
+display_name: Persian Wiktionary
+content_namespaces: [0]
+default_for_workspace: false
+aqs_project: fa.wiktionary.org
+pageviews_project: fa.wiktionary
+enabled: true
+sort_order: 2
+features:
+  pageviews: true
+  cohorts: true
+  reverts: true
+  unique_devices: true
+related_projects:
+  - fa.wikipedia

@@ -1,0 +1,775 @@
+metrics:
+- id: edits.total
+  display_name: Total edits
+  definition: All edits (all editor types) to all page types in the period.
+  methodology: AQS edits/aggregate with editor-type=all-editor-types and page-type=all-page-types.
+  source: aqs
+  unit: count
+  intervals:
+  - day
+  - month
+  module: overview
+  status: stable
+  sort_order: 10
+  caveats: Includes bot and anonymous edits. Redirect pages are included per AQS.
+  privacy_notes: Aggregate count only.
+  domain: context
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: edits.user
+  display_name: Human (registered user) edits
+  definition: Edits by registered users who are not classified as bots by AQS.
+  methodology: AQS edits/aggregate editor-type=user.
+  source: aqs
+  unit: count
+  intervals:
+  - day
+  - month
+  module: editors
+  status: stable
+  sort_order: 11
+  caveats: AQS user type excludes group-bot and name-bot; name-bot detection is heuristic.
+  privacy_notes: Aggregate count only.
+  domain: context
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: edits.group_bot
+  display_name: Group-bot edits
+  definition: Edits by accounts in bot user groups.
+  methodology: AQS edits/aggregate editor-type=group-bot.
+  source: aqs
+  unit: count
+  intervals:
+  - day
+  - month
+  module: editors
+  status: stable
+  sort_order: 12
+  domain: automation
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: edits.name_bot
+  display_name: Name-bot edits
+  definition: Edits by accounts matching bot naming patterns used by AQS.
+  methodology: AQS edits/aggregate editor-type=name-bot.
+  source: aqs
+  unit: count
+  intervals:
+  - day
+  - month
+  module: editors
+  status: stable
+  sort_order: 13
+  caveats: Name-bot classification is imperfect.
+  domain: automation
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: edits.anonymous
+  display_name: Anonymous edits
+  definition: Edits by unregistered users.
+  methodology: AQS edits/aggregate editor-type=anonymous.
+  source: aqs
+  unit: count
+  intervals:
+  - day
+  - month
+  module: editors
+  status: stable
+  sort_order: 14
+  domain: context
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: editors.active
+  display_name: Active editors
+  definition: 'Registered non-bot editors with five or more edits in the period (Wikimedia Research /
+    Wikistats-aligned activity threshold).
+
+    '
+  methodology: 'Sum of AQS editors/aggregate for editor-type=user activity levels 5..24-edits, 25..99-edits,
+    and 100..-edits. Page type all-page-types.
+
+    '
+  source: aqs
+  unit: count
+  intervals:
+  - month
+  module: editors
+  status: stable
+  sort_order: 20
+  caveats: 'Includes redirects. Activity levels are period-scoped (monthly). Slight differences may exist
+    versus dump-based Research definitions (archive tables, content-namespace filters).
+
+    '
+  privacy_notes: Aggregate count only; no individual editor lists.
+  domain: capacity
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: editors.highly_active
+  display_name: Highly active editors
+  definition: Registered non-bot editors with 100 or more edits in the period.
+  methodology: AQS editors/aggregate editor-type=user activity-level=100..-edits.
+  source: aqs
+  unit: count
+  intervals:
+  - month
+  module: editors
+  status: stable
+  sort_order: 21
+  privacy_notes: Aggregate count only.
+  domain: capacity
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: editors.activity_1_4
+  display_name: Editors with 1–4 edits
+  definition: Registered non-bot editors with 1–4 edits in the period.
+  methodology: AQS editors/aggregate activity-level=1..4-edits, editor-type=user.
+  source: aqs
+  unit: count
+  intervals:
+  - month
+  module: editors
+  status: stable
+  sort_order: 22
+  domain: context
+  role: deprecated
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  deprecation:
+    deprecated: true
+    message: Primary UI moved to Community Health domains or New Editor Health Dashboard.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: editors.activity_5_24
+  display_name: Editors with 5–24 edits
+  definition: Registered non-bot editors with 5–24 edits in the period.
+  methodology: AQS editors/aggregate activity-level=5..24-edits, editor-type=user.
+  source: aqs
+  unit: count
+  intervals:
+  - month
+  module: editors
+  status: stable
+  sort_order: 23
+  domain: context
+  role: deprecated
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  deprecation:
+    deprecated: true
+    message: Primary UI moved to Community Health domains or New Editor Health Dashboard.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: editors.activity_25_99
+  display_name: Editors with 25–99 edits
+  definition: Registered non-bot editors with 25–99 edits in the period.
+  methodology: AQS editors/aggregate activity-level=25..99-edits, editor-type=user.
+  source: aqs
+  unit: count
+  intervals:
+  - month
+  module: editors
+  status: stable
+  sort_order: 24
+  domain: context
+  role: deprecated
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  deprecation:
+    deprecated: true
+    message: Primary UI moved to Community Health domains or New Editor Health Dashboard.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: editors.new_accounts
+  display_name: New registered users
+  definition: Newly registered user accounts in the period.
+  methodology: AQS registered-users/new for the project.
+  source: aqs
+  unit: count
+  intervals:
+  - day
+  - month
+  module: editors
+  status: stable
+  sort_order: 25
+  caveats: Registration does not imply a first edit.
+  privacy_notes: Aggregate count only.
+  domain: capacity
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: content.pages_created
+  display_name: New pages
+  definition: Pages created in the period (all page types unless filtered).
+  methodology: AQS edited-pages/new editor-type=all-editor-types page-type=all-page-types.
+  source: aqs
+  unit: count
+  intervals:
+  - day
+  - month
+  module: content
+  status: stable
+  sort_order: 30
+  caveats: Not a quality measure. Includes non-content namespaces when page-type is all.
+  domain: context
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: content.pages_created_content
+  display_name: New content pages
+  definition: Content-namespace pages created in the period.
+  methodology: AQS edited-pages/new page-type=content.
+  source: aqs
+  unit: count
+  intervals:
+  - day
+  - month
+  module: content
+  status: stable
+  sort_order: 31
+  caveats: Avoid treating raw article counts as quality.
+  domain: context
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: content.pages_edited
+  display_name: Edited pages
+  definition: Distinct pages that received at least one edit in the period.
+  methodology: AQS edited-pages/aggregate.
+  source: aqs
+  unit: count
+  intervals:
+  - day
+  - month
+  module: content
+  status: stable
+  sort_order: 32
+  domain: context
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: readers.pageviews
+  display_name: Pageviews
+  definition: Page views by user agents (non-spider) unless otherwise noted.
+  methodology: AQS pageviews/aggregate access=all-access agent=user.
+  source: aqs
+  unit: count
+  intervals:
+  - day
+  - month
+  module: overview
+  status: stable
+  sort_order: 40
+  caveats: Agent=user excludes spiders. Data typically lags ~24–48 hours.
+  domain: context
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: readers.unique_devices
+  display_name: Unique devices
+  definition: Privacy-preserving estimate of unique devices visiting the project.
+  methodology: AQS unique-devices all-sites.
+  source: aqs
+  unit: count
+  intervals:
+  - day
+  - month
+  module: overview
+  status: stable
+  sort_order: 41
+  caveats: One reader may use multiple devices; cookie-based methodology.
+  domain: context
+  role: official_context
+  metric_version: 1.0.0
+  provenance_notes: Consumed from Wikimedia Analytics API (AQS), the same family of official metrics surfaced
+    by Wikistats. Not independently re-derived.
+  source_endpoint: https://wikimedia.org/api/rest_v1/metrics/
+- id: content.pages_deleted
+  display_name: Page deletions
+  definition: Delete log events in the period (page deletions).
+  methodology: MediaWiki API list=logevents letype=delete aggregated by UTC day/month.
+  source: mediawiki
+  unit: count
+  intervals:
+  - day
+  - month
+  module: content
+  status: experimental
+  sort_order: 50
+  caveats: Counts log events, not unique pages. Rate-limited API sampling may miss volume on huge wikis.
+  domain: admin
+  role: health
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+- id: moderation.blocks
+  display_name: Blocks
+  definition: Block log events in the period.
+  methodology: MediaWiki API list=logevents letype=block aggregated by UTC day/month.
+  source: mediawiki
+  unit: count
+  intervals:
+  - day
+  - month
+  module: overview
+  status: experimental
+  sort_order: 51
+  caveats: Includes blocks and unblocks depending on log filters; see methodology page.
+  privacy_notes: Aggregate only; no target user lists in Observatory UI.
+  domain: admin
+  role: health
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+- id: reverts.count
+  display_name: Reverted edits
+  definition: Edits tagged as reverted (mw-reverted) where measurable.
+  methodology: 'Prefer wiki replicas (change_tag). Fallback experimental sample via MediaWiki API is not
+    used for stable reporting. Requires Toolforge replicas for accuracy.
+
+    '
+  source: replica
+  unit: count
+  intervals:
+  - day
+  - month
+  module: reverts
+  status: unavailable_without_replicas
+  sort_order: 60
+  caveats: Tag coverage varies by wiki and date. Community-health signal only.
+  privacy_notes: Aggregate rates only; no individual user scoreboards.
+  domain: conflict
+  role: health
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+- id: reverts.rate
+  display_name: Revert rate
+  definition: Share of edits that were later reverted, where measurable.
+  methodology: reverts.count / edits.user for the same period when both available.
+  source: derived
+  unit: ratio
+  intervals:
+  - month
+  module: reverts
+  status: unavailable_without_replicas
+  sort_order: 61
+  domain: conflict
+  role: derived
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+- id: reverts.newcomer_rate
+  display_name: Newcomer revert rate
+  definition: Share of newcomer edits that were reverted, where measurable.
+  methodology: Replica-based; newcomers defined by first-edit cohort config.
+  source: replica
+  unit: ratio
+  intervals:
+  - month
+  module: reverts
+  status: unavailable_without_replicas
+  sort_order: 62
+  privacy_notes: Aggregate only.
+  domain: conflict
+  role: deprecated
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+  deprecation:
+    deprecated: true
+    message: Primary UI moved to Community Health domains or New Editor Health Dashboard.
+- id: editors.returning
+  display_name: Returning editors
+  definition: Active editors in the period who also edited in a prior lookback window.
+  methodology: Wiki replicas required. Lookback configurable (default 30 days prior).
+  source: replica
+  unit: count
+  intervals:
+  - month
+  module: editors
+  status: unavailable_without_replicas
+  sort_order: 70
+  domain: capacity
+  role: deprecated
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+  deprecation:
+    deprecated: true
+    message: Primary UI moved to Community Health domains or New Editor Health Dashboard.
+- id: funnel.accounts
+  display_name: Funnel — new accounts
+  definition: Accounts registered in the cohort month.
+  methodology: Replica registration query or AQS registered-users/new as coarse proxy.
+  source: replica
+  unit: count
+  intervals:
+  - month
+  module: funnel
+  status: unavailable_without_replicas
+  sort_order: 80
+  domain: capacity
+  role: deprecated
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+  deprecation:
+    deprecated: true
+    message: Primary UI moved to Community Health domains or New Editor Health Dashboard.
+- id: funnel.first_edit
+  display_name: Funnel — first edit
+  definition: Cohort members who made at least one edit.
+  methodology: Replica first-edit join against registration cohort.
+  source: replica
+  unit: count
+  intervals:
+  - month
+  module: funnel
+  status: unavailable_without_replicas
+  sort_order: 81
+  domain: capacity
+  role: deprecated
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+  deprecation:
+    deprecated: true
+    message: Primary UI moved to Community Health domains or New Editor Health Dashboard.
+- id: funnel.second_edit
+  display_name: Funnel — second edit
+  definition: Cohort members who made at least two edits.
+  methodology: Replica edit counts for registration cohort.
+  source: replica
+  unit: count
+  intervals:
+  - month
+  module: funnel
+  status: unavailable_without_replicas
+  sort_order: 82
+  domain: capacity
+  role: deprecated
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+  deprecation:
+    deprecated: true
+    message: Primary UI moved to Community Health domains or New Editor Health Dashboard.
+- id: funnel.active_7d
+  display_name: Funnel — active within 7 days
+  definition: Cohort members with an edit within 7 days of registration.
+  methodology: Replica retention window.
+  source: replica
+  unit: count
+  intervals:
+  - month
+  module: funnel
+  status: unavailable_without_replicas
+  sort_order: 83
+  domain: capacity
+  role: deprecated
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+  deprecation:
+    deprecated: true
+    message: Primary UI moved to Community Health domains or New Editor Health Dashboard.
+- id: funnel.active_30d
+  display_name: Funnel — active within 30 days
+  definition: Cohort members with an edit within 30 days of registration.
+  methodology: Replica retention window.
+  source: replica
+  unit: count
+  intervals:
+  - month
+  module: funnel
+  status: unavailable_without_replicas
+  sort_order: 84
+  domain: capacity
+  role: deprecated
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+  deprecation:
+    deprecated: true
+    message: Primary UI moved to Community Health domains or New Editor Health Dashboard.
+- id: funnel.active_90d
+  display_name: Funnel — active within 90 days
+  definition: Cohort members with an edit within 90 days of registration.
+  methodology: Replica retention window.
+  source: replica
+  unit: count
+  intervals:
+  - month
+  module: funnel
+  status: unavailable_without_replicas
+  sort_order: 85
+  domain: capacity
+  role: deprecated
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+  deprecation:
+    deprecated: true
+    message: Primary UI moved to Community Health domains or New Editor Health Dashboard.
+- id: funnel.active_180d
+  display_name: Funnel — active within 180 days
+  definition: Cohort members with an edit within 180 days of registration.
+  methodology: Replica retention window.
+  source: replica
+  unit: count
+  intervals:
+  - month
+  module: funnel
+  status: unavailable_without_replicas
+  sort_order: 86
+  domain: capacity
+  role: deprecated
+  metric_version: 1.0.0
+  provenance_notes: Official Wikimedia Analytics (AQS) where source=aqs.
+  deprecation:
+    deprecated: true
+    message: Primary UI moved to Community Health domains or New Editor Health Dashboard.
+- id: admin.blocks
+  display_name: Blocks
+  definition: Block log events (block actions) in the period.
+  methodology: MediaWiki logevents letype=block, action=block aggregated by UTC period.
+  source: mediawiki
+  unit: count
+  intervals:
+  - day
+  - month
+  module: admin
+  domain: admin
+  role: health
+  status: experimental
+  sort_order: 200
+  metric_version: 1.0.0
+  caveats: Log event counts, not unique targets. API pagination may truncate on huge wikis.
+  privacy_notes: Aggregate only; no target user lists in public UI.
+- id: admin.unblocks
+  display_name: Unblocks
+  definition: Unblock log events in the period.
+  methodology: MediaWiki logevents letype=block, action=unblock.
+  source: mediawiki
+  unit: count
+  intervals:
+  - day
+  - month
+  module: admin
+  domain: admin
+  role: health
+  status: experimental
+  sort_order: 201
+  metric_version: 1.0.0
+- id: admin.protections
+  display_name: Page protections
+  definition: Protect log events that apply or change protection.
+  methodology: MediaWiki logevents letype=protect (non-unprotect actions).
+  source: mediawiki
+  unit: count
+  intervals:
+  - day
+  - month
+  module: admin
+  domain: admin
+  role: health
+  status: experimental
+  sort_order: 202
+  metric_version: 1.0.0
+- id: admin.unprotections
+  display_name: Page unprotections
+  definition: Unprotect log events in the period.
+  methodology: MediaWiki logevents letype=protect, action=unprotect.
+  source: mediawiki
+  unit: count
+  intervals:
+  - day
+  - month
+  module: admin
+  domain: admin
+  role: health
+  status: experimental
+  sort_order: 203
+  metric_version: 1.0.0
+- id: admin.deletions
+  display_name: Deletions
+  definition: Delete log events in the period.
+  methodology: MediaWiki logevents letype=delete, action=delete.
+  source: mediawiki
+  unit: count
+  intervals:
+  - day
+  - month
+  module: admin
+  domain: admin
+  role: health
+  status: experimental
+  sort_order: 204
+  metric_version: 1.0.0
+- id: admin.undeletions
+  display_name: Undeletions
+  definition: Undelete log events in the period.
+  methodology: MediaWiki logevents letype=delete, action=restore.
+  source: mediawiki
+  unit: count
+  intervals:
+  - day
+  - month
+  module: admin
+  domain: admin
+  role: health
+  status: experimental
+  sort_order: 205
+  metric_version: 1.0.0
+- id: admin.moves
+  display_name: Page moves
+  definition: Move log events in the period.
+  methodology: MediaWiki logevents letype=move.
+  source: mediawiki
+  unit: count
+  intervals:
+  - day
+  - month
+  module: admin
+  domain: admin
+  role: health
+  status: experimental
+  sort_order: 206
+  metric_version: 1.0.0
+- id: admin.rights_changes
+  display_name: User rights changes
+  definition: Rights log events in the period.
+  methodology: MediaWiki logevents letype=rights.
+  source: mediawiki
+  unit: count
+  intervals:
+  - day
+  - month
+  module: admin
+  domain: admin
+  role: health
+  status: experimental
+  sort_order: 207
+  metric_version: 1.0.0
+  privacy_notes: Aggregate count only.
+- id: admin.actions_total
+  display_name: Administrative actions (total)
+  definition: Sum of configured administrative log action families.
+  methodology: Sum of admin.blocks, unblocks, protections, unprotections, deletions, undeletions, moves,
+    rights_changes for the period.
+  source: derived
+  unit: count
+  intervals:
+  - month
+  module: admin
+  domain: admin
+  role: derived
+  status: experimental
+  sort_order: 210
+  metric_version: 1.0.0
+  formula: sum(admin.* log families)
+- id: admin.actions_per_active_editor
+  display_name: Admin actions per active editor
+  definition: Administrative actions divided by official active editors for the same period.
+  methodology: admin.actions_total / editors.active (AQS).
+  source: derived
+  unit: ratio
+  intervals:
+  - month
+  module: admin
+  domain: admin
+  role: derived
+  status: experimental
+  sort_order: 211
+  metric_version: 1.0.0
+  numerator: admin.actions_total
+  denominator: editors.active
+  formula: admin.actions_total / editors.active
+- id: maintenance.open_total
+  display_name: Maintenance backlog (configured tracks)
+  definition: Sum of open item counts across enabled project maintenance tracks.
+  methodology: Sum of categoryinfo sizes (or process open counts) for enabled maintenance_tracks in project
+    health config.
+  source: mediawiki
+  unit: count
+  intervals:
+  - day
+  - month
+  module: maintenance
+  domain: maintenance
+  role: health
+  status: stable
+  sort_order: 300
+  metric_version: 1.0.0
+  caveats: Only configured tracks. Categories differ by wiki; not a universal quality score.
+- id: maintenance.backlog_per_active_editor
+  display_name: Maintenance backlog per active editor
+  definition: Open configured maintenance items per active editor.
+  methodology: maintenance.open_total / editors.active
+  source: derived
+  unit: ratio
+  intervals:
+  - month
+  module: maintenance
+  domain: maintenance
+  role: derived
+  status: stable
+  sort_order: 301
+  metric_version: 1.0.0
+  numerator: maintenance.open_total
+  denominator: editors.active
+  formula: maintenance.open_total / editors.active
+- id: automation.bot_edit_share
+  display_name: Bot edit share
+  definition: Share of edits performed by bots (group-bot + name-bot) among all edits.
+  methodology: (edits.group_bot + edits.name_bot) / edits.total using official AQS series.
+  source: derived
+  unit: ratio
+  intervals:
+  - month
+  module: automation
+  domain: automation
+  role: derived
+  status: stable
+  sort_order: 400
+  metric_version: 1.0.0
+  numerator: edits.group_bot + edits.name_bot
+  denominator: edits.total
+  formula: (edits.group_bot + edits.name_bot) / edits.total
+  caveats: Describes dependence on automation, not bot quality. Do not infer causation with backlog changes.
+- id: reverts.rate_official_denom
+  display_name: Revert rate (vs human edits)
+  definition: Reverted edits divided by human edits when both available.
+  methodology: reverts.count / edits.user
+  source: derived
+  unit: ratio
+  intervals:
+  - month
+  module: conflict
+  domain: conflict
+  role: derived
+  status: unavailable_without_replicas
+  sort_order: 250
+  metric_version: 1.0.0
+  numerator: reverts.count
+  denominator: edits.user
+  formula: reverts.count / edits.user

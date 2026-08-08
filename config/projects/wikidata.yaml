@@ -1,0 +1,24 @@
+id: wikidata
+domain: www.wikidata.org
+dbname: wikidatawiki
+language: mul
+language_script: Latn
+text_direction: ltr
+family: wikidata
+display_name: Wikidata
+content_namespaces: [0]
+default_for_workspace: false
+aqs_project: wikidata.org
+pageviews_project: wikidata
+enabled: true
+sort_order: 21
+features:
+  pageviews: true
+  cohorts: false
+  reverts: true
+  unique_devices: true
+related_projects:
+  - fa.wikipedia
+campaign_filters:
+  wikidata_items: []
+notes: Structured data repository. Item filters are optional configuration.
