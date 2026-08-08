@@ -44,26 +44,26 @@ health:
       notes: "Set category to the local tracking category title (without Category prefix) after verification."
     - id: needs_cleanup
       kind: category
-      category: null
+      category: همه صفحه‌های نیازمند تمیزکاری
       label: Articles needing cleanup
-      enabled: false
+      enabled: true
       notes: Populate with verified local cleanup category.
     - id: orphans
       kind: category
-      category: null
+      category: همه مقاله‌های یتیم
       label: Orphaned pages
-      enabled: false
+      enabled: true
     - id: needs_wikification
       kind: category
-      category: null
+      category: مقاله‌های نیازمند به ویکی‌سازی
       label: Pages needing wikification
-      enabled: false
+      enabled: true
   process_tracks:
     - id: deletion_discussions
       kind: category
-      category: null
+      category: بحث‌های نبح
       label: Deletion discussions (open)
-      enabled: false
+      enabled: true
       notes: Point at the local open-deletion discussion category or process page list.
     - id: admin_noticeboard
       kind: category
