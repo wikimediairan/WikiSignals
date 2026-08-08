@@ -164,8 +164,8 @@ become YOURTOOL
 toolforge build start https://github.com/wikimediairan/WikiSignals.git
 # wait until build succeeds
 
-toolforge webservice buildservice start
-# or: toolforge webservice restart
+toolforge webservice buildservice --mount=none start
+# or: toolforge webservice --mount=none restart
 ```
 
 Dockerfile CMD uses uvicorn/gunicorn; ensure `PORT` is honored if your image wrapper sets it. This repo’s `backend/gunicorn.conf.py` binds `0.0.0.0:$PORT`.
