@@ -71,6 +71,10 @@ class WikiReplicasProvider:
     async def __aexit__(self, *args: object) -> None:
         if self._conn is not None:
             self._conn.close()
+            try:
+                await self._conn.ensure_closed()
+            except Exception:  # noqa: BLE001
+                logger.debug("replica connection ensure_closed failed", exc_info=True)
             self._conn = None
 
     def _require(self) -> None:
@@ -155,10 +159,9 @@ class WikiReplicasProvider:
             await cur.execute(sql, ("mw-reverted", start_ts, end_ts))
             rows = await cur.fetchall()
             for ym, count in rows:
-                # ym is YYYYMM
-                y = int(str(ym)[0:4])
-                m = int(str(ym)[4:6])
-                points.append(SeriesPoint(period_start=date(y, m, 1), value=float(count)))
+                points.append(
+                    SeriesPoint(period_start=_ym_to_period(ym), value=float(count))
+                )
         return SeriesResult(metric_id="reverts.count", points=points, source="replica")
 
     async def fetch_active_admins_monthly(
@@ -209,10 +212,27 @@ class WikiReplicasProvider:
             await cur.execute(sql, params)
             rows = await cur.fetchall()
             for ym, count in rows:
-                y = int(str(ym)[0:4])
-                m = int(str(ym)[4:6])
-                points.append(SeriesPoint(period_start=date(y, m, 1), value=float(count)))
+                points.append(
+                    SeriesPoint(period_start=_ym_to_period(ym), value=float(count))
+                )
         return SeriesResult(metric_id="capacity.active_admins", points=points, source="replica")
+
+
+def _ym_to_period(ym: Any) -> date:
+    """Parse LEFT(timestamp, 6) as YYYYMM. aiomysql often returns bytes for binary columns."""
+    if isinstance(ym, memoryview):
+        ym = ym.tobytes()
+    if isinstance(ym, (bytes, bytearray)):
+        s = bytes(ym).decode("ascii", errors="replace")
+    else:
+        s = str(ym)
+    s = s.strip()
+    # Guard against accidental "b'202408'" if something double-stringified
+    if s.startswith("b'") and s.endswith("'"):
+        s = s[2:-1]
+    if len(s) < 6 or not s[:6].isdigit():
+        raise ValueError(f"Unexpected year-month value from replica: {ym!r}")
+    return date(int(s[0:4]), int(s[4:6]), 1)
 
 
 def re_group(name: str) -> bool:
