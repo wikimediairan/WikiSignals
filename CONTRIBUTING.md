@@ -138,6 +138,8 @@ npm ci
 npm run build
 ```
 
+The UI is **English-only** for now. `frontend/src/i18n/fa.json` is kept as a draft and is not loaded until translations are improved.
+
 ---
 
 ## Adding a Wikimedia project
