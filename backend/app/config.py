@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from urllib.parse import quote_plus
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -87,20 +88,21 @@ class Settings(BaseSettings):
     config_dir: str = ""
 
     def model_post_init(self, __context: object) -> None:
-        # ToolsDB: prefer explicit DATABASE_URL; else compose from Toolforge envvars
-        if (
-            (not self.database_url or "127.0.0.1" in self.database_url or "localhost" in self.database_url)
-            and self.tool_toolsdb_user
-            and self.tool_toolsdb_password
-        ):
+        # ToolsDB: prefer explicit non-local DATABASE_URL; else compose from Toolforge envvars
+        defaultish = (
+            not self.database_url
+            or "127.0.0.1" in self.database_url
+            or "localhost" in self.database_url
+            or "observatory:observatory@" in self.database_url
+        )
+        if defaultish and self.tool_toolsdb_user and self.tool_toolsdb_password:
             db_name = self.toolsdb_name or f"{self.tool_toolsdb_user}__wikisignals"
+            user = quote_plus(self.tool_toolsdb_user)
+            password = quote_plus(self.tool_toolsdb_password)
             object.__setattr__(
                 self,
                 "database_url",
-                (
-                    f"mysql+aiomysql://{self.tool_toolsdb_user}:{self.tool_toolsdb_password}"
-                    f"@{self.toolsdb_host}:3306/{db_name}"
-                ),
+                f"mysql+aiomysql://{user}:{password}@{self.toolsdb_host}:3306/{db_name}",
             )
         # Replicas: fill user/password from Toolforge if not set
         if self.tool_replica_user and not self.wiki_replicas_user:
@@ -114,19 +116,34 @@ class Settings(BaseSettings):
 
     @property
     def resolved_config_dir(self) -> Path:
+        """Find config/ containing projects/*.yaml (buildpack, docker, or local)."""
+        candidates: list[Path] = []
         if self.config_dir:
-            return Path(self.config_dir)
-        docker_mount = Path("/config")
-        if docker_mount.is_dir() and any(docker_mount.iterdir()):
-            return docker_mount
-        repo_config = _REPO_ROOT / "config"
-        if repo_config.is_dir():
-            return repo_config
-        # Buildpack: code may live under /workspace with config at repo root
-        workspace_config = Path("/workspace/config")
-        if workspace_config.is_dir():
-            return workspace_config
-        return _BACKEND_DIR / "config"
+            candidates.append(Path(self.config_dir))
+        candidates.extend(
+            [
+                _REPO_ROOT / "config",
+                Path("/workspace/config"),
+                Path.cwd() / "config",
+                Path.cwd().parent / "config",
+                Path("/config"),
+                _BACKEND_DIR / "config",
+            ]
+        )
+        for path in candidates:
+            try:
+                if path.is_dir() and (path / "projects").is_dir() and any((path / "projects").glob("*.yaml")):
+                    return path
+            except OSError:
+                continue
+        # Last resort: first existing directory even if empty (callers should fail loudly)
+        for path in candidates:
+            try:
+                if path.is_dir():
+                    return path
+            except OSError:
+                continue
+        return _REPO_ROOT / "config"
 
 
 @lru_cache

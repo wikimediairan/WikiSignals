@@ -37,10 +37,20 @@ def _session_factory():
 
 
 async def _async_bootstrap(skip_ingest: bool, project: Optional[str], months: int) -> None:
+    settings = get_settings()
+    typer.echo(f"config_dir={settings.resolved_config_dir}")
+    typer.echo(f"database_url_host={_safe_db_host(settings.database_url)}")
     factory = _session_factory()
     async with factory() as session:
         counts = await bootstrap_registry(session)
         typer.echo(f"Registry seeded: {counts}")
+        if int(counts.get("projects") or 0) < 1:
+            typer.echo(
+                "ERROR: seeded 0 projects. Check config/projects on the image "
+                "(unset CONFIG_DIR if it points at a missing path like /config).",
+                err=True,
+            )
+            raise typer.Exit(1)
         if skip_ingest:
             return
         end = month_start(utc_today())
@@ -48,8 +58,6 @@ async def _async_bootstrap(skip_ingest: bool, project: Optional[str], months: in
         ids = [project] if project else None
         # Default bootstrap focuses on Persian suite + peers if --all not limited
         if ids is None:
-            # Prefer default workspace first for demo
-            settings = get_settings()
             preferred = [
                 settings.default_project_id,
                 "fa.wiktionary",
@@ -64,6 +72,16 @@ async def _async_bootstrap(skip_ingest: bool, project: Optional[str], months: in
                 session, start=start, end=end, project_ids=ids, include_mediawiki=False
             )
         typer.echo(f"Ingest complete: {results}")
+
+
+def _safe_db_host(url: str) -> str:
+    """Log host/db without password."""
+    try:
+        # mysql+aiomysql://user:pass@host:3306/db
+        after_at = url.split("@", 1)[1]
+        return after_at
+    except Exception:  # noqa: BLE001
+        return "(unparseable)"
 
 
 @app.command()
@@ -212,11 +230,46 @@ def verify(
     raise typer.Exit(code)
 
 
+async def _async_seed_only() -> None:
+    settings = get_settings()
+    typer.echo(f"config_dir={settings.resolved_config_dir}")
+    typer.echo(f"database_url_host={_safe_db_host(settings.database_url)}")
+    factory = _session_factory()
+    async with factory() as session:
+        counts = await bootstrap_registry(session)
+        typer.echo(f"Registry seeded: {counts}")
+        if int(counts.get("projects") or 0) < 1:
+            typer.echo(
+                "ERROR: seeded 0 projects. Unset CONFIG_DIR if set to /config "
+                f"(resolved={settings.resolved_config_dir}).",
+                err=True,
+            )
+            raise typer.Exit(1)
+
+
 @app.command("seed-registry")
 def seed_registry_only() -> None:
     """Seed projects/metrics/annotations without network calls."""
     _setup_logging()
-    asyncio.run(_async_bootstrap(skip_ingest=True, project=None, months=0))
+    asyncio.run(_async_seed_only())
+
+
+@app.command("diagnose")
+def diagnose() -> None:
+    """Print config/DB resolution (no secrets) for Toolforge debugging."""
+    _setup_logging()
+    settings = get_settings()
+    cfg = settings.resolved_config_dir
+    projects = list((cfg / "projects").glob("*.yaml")) if (cfg / "projects").is_dir() else []
+    typer.echo(f"app_name={settings.app_name}")
+    typer.echo(f"environment={settings.environment}")
+    typer.echo(f"config_dir_env={settings.config_dir!r}")
+    typer.echo(f"resolved_config_dir={cfg}")
+    typer.echo(f"project_yaml_count={len(projects)}")
+    typer.echo(f"project_yaml_sample={[p.name for p in projects[:5]]}")
+    typer.echo(f"database_url_host={_safe_db_host(settings.database_url)}")
+    typer.echo(f"tool_toolsdb_user_set={bool(settings.tool_toolsdb_user)}")
+    typer.echo(f"user_agent={settings.user_agent!r}")
 
 
 async def _async_collect_health(project: str, months: int, reload_config: bool) -> None:

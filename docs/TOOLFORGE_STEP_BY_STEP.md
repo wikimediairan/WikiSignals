@@ -113,7 +113,20 @@ Expect `"status":"ok"` and `"service":"wikisignals"`.
 
 Image name is usually `tool-wikisignals/tool-wikisignals:latest`.
 
+**Important:** Do **not** set `CONFIG_DIR=/config` (that was for the old Docker image).  
+On the buildpack image, config lives in the git tree (`/workspace/config`).  
+If `CONFIG_DIR` is set to a missing path, seed completes with **0 projects** and the API returns `Project not found`.
+
 ```bash
+# Remove bad env if you set it earlier:
+toolforge envvars delete CONFIG_DIR   # ignore error if unset
+
+toolforge jobs run wikisignals-diagnose \
+  --image tool-wikisignals/tool-wikisignals:latest \
+  --command "diagnose" \
+  --wait --emails onfailure
+# Expect: project_yaml_count >= 1 and database_url_host containing tools.db...
+
 toolforge jobs run wikisignals-migrate \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "migrate" \
@@ -123,11 +136,20 @@ toolforge jobs run wikisignals-seed \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "seed" \
   --wait --emails onfailure
+# Expect logs: Registry seeded: {..., 'projects': 7, ...}
+# If projects is 0, seed now fails (exit 1).
 
 toolforge jobs run wikisignals-check \
   --image tool-wikisignals/tool-wikisignals:latest \
   --command "check" \
   --wait --emails onfailure
+```
+
+Verify the live API:
+
+```bash
+curl -sS https://wikisignals.toolforge.org/api/v1/projects
+# should list fa.wikipedia etc.
 ```
 
 ---

@@ -33,9 +33,11 @@ def health_config_version(health: dict[str, Any] | None) -> str:
 
 async def seed_projects(session: AsyncSession, settings: Settings | None = None) -> int:
     settings = settings or get_settings()
-    projects_dir = settings.resolved_config_dir / "projects"
+    config_dir = settings.resolved_config_dir
+    projects_dir = config_dir / "projects"
+    logger.info("Seeding projects from %s", projects_dir)
     if not projects_dir.is_dir():
-        logger.warning("Projects config dir missing: %s", projects_dir)
+        logger.error("Projects config dir missing: %s (config_dir=%s)", projects_dir, config_dir)
         return 0
     count = 0
     for path in sorted(projects_dir.glob("*.yaml")):
@@ -157,8 +159,11 @@ async def seed_annotations(session: AsyncSession, settings: Settings | None = No
 
 
 async def bootstrap_registry(session: AsyncSession, settings: Settings | None = None) -> dict[str, int]:
-    return {
+    settings = settings or get_settings()
+    counts = {
         "projects": await seed_projects(session, settings),
         "metrics": await seed_metrics(session, settings),
         "annotations": await seed_annotations(session, settings),
+        "config_dir": str(settings.resolved_config_dir),
     }
+    return counts

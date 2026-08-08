@@ -9,6 +9,7 @@ web: bash -c "export HOME=/tmp TMPDIR=/tmp XDG_CACHE_HOME=/tmp/.cache && cd back
 
 migrate: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec alembic upgrade head"
 seed: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec python -m app.jobs.cli seed-registry"
+diagnose: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec python -m app.jobs.cli diagnose"
 bootstrap: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec python -m app.jobs.cli bootstrap --project fa.wikipedia --months 24"
 # ~5 years of official AQS activity context (one-time / rare — not daily)
 bootstrap-5y: bash -c "export HOME=/tmp TMPDIR=/tmp && cd backend && exec python -m app.jobs.cli bootstrap --project fa.wikipedia --months 60"
