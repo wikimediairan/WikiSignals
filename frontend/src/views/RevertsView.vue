@@ -27,7 +27,8 @@ watch(
     <h1>{{ t('reverts.title') }}</h1>
     <p class="muted">{{ t('reverts.intro') }}</p>
     <FilterBar />
-    <div class="callout warn">
+    <!-- Capability note only when series is empty / replicas not configured -->
+    <div v-if="!series?.points?.length" class="callout warn">
       {{ series?.unavailable_reason || t('reverts.requiresReplicas') }}
     </div>
     <div class="panel">

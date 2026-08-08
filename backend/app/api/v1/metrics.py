@@ -36,9 +36,22 @@ def _series_out(
     points,
     definition,
 ) -> MetricSeriesOut:
-    status = definition.status if definition else "unknown"
+    """
+    Series `status` is about *this response* (has data or not).
+
+    Catalog may mark metrics as `unavailable_without_replicas` as a capability
+    flag on the definition; that must not appear as a badge once points exist.
+    """
+    def_status = definition.status if definition else "unknown"
     unavailable_reason = None
-    if definition and definition.status == "unavailable_without_replicas" and not points:
+
+    if points:
+        # Live series is available; capability flags stay on definition only.
+        if def_status in ("unavailable_without_replicas", "unavailable"):
+            status = "stable"
+        else:
+            status = def_status
+    elif def_status == "unavailable_without_replicas":
         status = "unavailable"
         unavailable_reason = (
             "This metric requires Toolforge wiki replicas and stored series points. "
@@ -46,16 +59,19 @@ def _series_out(
             "`collect-replicas` (backfill) or `daily` (recent months). "
             "collect-health does not fill reverts."
         )
+    else:
+        status = def_status
+
     return MetricSeriesOut(
         project_id=project_id,
         metric_id=metric_id,
         interval=interval,
         start=start,
         end=end,
-        status=status if points or not unavailable_reason else status,
+        status=status,
         definition=MetricDefinitionOut.model_validate(definition) if definition else None,
         points=[SeriesPointOut(period_start=p.period_start, value=p.value, source=p.source) for p in points],
-        unavailable_reason=unavailable_reason if not points else None,
+        unavailable_reason=unavailable_reason,
     )
 
 

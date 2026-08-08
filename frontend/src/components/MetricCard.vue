@@ -22,7 +22,11 @@ const delta = computed(() =>
   <div class="card">
     <div class="label">
       {{ label }}
-      <span v-if="status && status !== 'stable'" class="badge">{{ status }}</span>
+      <!-- Hide capability/pipeline flags; show only meaningful live statuses -->
+      <span
+        v-if="status && !['stable', 'unavailable_without_replicas', 'unknown'].includes(status)"
+        class="badge"
+      >{{ status }}</span>
     </div>
     <div v-if="latest" class="value">{{ formatNumber(latest.value, locale) }}</div>
     <div v-else class="value muted">—</div>
