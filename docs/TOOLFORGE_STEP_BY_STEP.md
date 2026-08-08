@@ -43,13 +43,13 @@ Do **not** schedule full multi-year bootstrap every day.
 
 ### Step 3 — Put the code where Toolforge can build it
 
-Preferred: [GitLab toolforge-repos](https://wikitech.wikimedia.org/wiki/Help:Toolforge/GitLab):
+Code is hosted on GitHub:
 
 ```text
-https://gitlab.wikimedia.org/toolforge-repos/YOURTOOL
+https://github.com/wikimediairan/WikiSignals
 ```
 
-Push this repository (including root `Dockerfile`, `backend/`, `config/`, and built frontend).
+Toolforge buildservice can build from a public GitHub URL. Push this repository (including root `Dockerfile`, `backend/`, `config/`, and built frontend).
 
 ### Step 4 — Build the frontend **on your laptop** and commit it
 
@@ -222,7 +222,7 @@ toolforge envvars list
 ```bash
 become YOURTOOL
 
-toolforge build start https://gitlab.wikimedia.org/toolforge-repos/YOURTOOL.git
+toolforge build start https://github.com/wikimediairan/WikiSignals.git
 # wait until status is successful
 toolforge build list
 ```
@@ -460,7 +460,7 @@ python -m app.jobs.cli check-connectivity   # inside a job
 ## Checklist (print and tick)
 
 - [ ] Tool account created  
-- [ ] Code on GitLab toolforge-repos  
+- [ ] Code on GitHub (wikimediairan/WikiSignals)  
 - [ ] Frontend built and committed under `backend/app/static`  
 - [ ] ToolsDB `sXXXXX__wikisignals` created  
 - [ ] `USER_AGENT` real contact  

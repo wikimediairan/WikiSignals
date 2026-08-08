@@ -40,7 +40,7 @@ Browser → https://YOURTOOL.toolforge.org
 
 1. [Wikimedia developer account](https://wikitech.wikimedia.org/wiki/Help:Create_a_Wikimedia_developer_account)
 2. Tool account on [toolsadmin.wikimedia.org](https://toolsadmin.wikimedia.org/) (example name: `wikisignals`)
-3. Git remote (GitLab `toolforge-repos` recommended)
+3. Git remote (GitHub repo recommended (`wikimediairan/WikiSignals`))
 4. Toolforge membership / ability to `become YOURTOOL`
 
 ---
@@ -161,7 +161,7 @@ From the tool account (after the repo is available to the build service):
 ```bash
 become YOURTOOL
 
-toolforge build start https://gitlab.wikimedia.org/toolforge-repos/YOURTOOL.git
+toolforge build start https://github.com/wikimediairan/WikiSignals.git
 # wait until build succeeds
 
 toolforge webservice buildservice start
